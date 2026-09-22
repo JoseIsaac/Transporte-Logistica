@@ -1,0 +1,62 @@
+<div class="contenedor">
+  <h1>📊 Panel de Control</h1>
+
+  @if (cargando) {
+    <div class="cargando">Cargando datos...</div>
+  } @else {
+    <!-- Tarjetas de resumen -->
+    <div class="tarjetas-resumen">
+      <div class="tarjeta verde">
+        <h3>🟢 En Óptimas Condiciones</h3>
+        <p class="numero">{{ resumen?.VERDE }}</p>
+      </div>
+      <div class="tarjeta amarillo">
+        <h3>🟡 Revisión Preventiva</h3>
+        <p class="numero">{{ resumen?.AMARILLO }}</p>
+      </div>
+      <div class="tarjeta rojo">
+        <h3>🔴 Fuera de Servicio</h3>
+        <p class="numero">{{ resumen?.ROJO }}</p>
+      </div>
+      <div class="tarjeta total">
+        <h3>🚛 Total Unidades</h3>
+        <p class="numero">{{ resumen?.TOTAL }}</p>
+      </div>
+    </div>
+
+    <!-- Tabla de unidades -->
+    <div class="tabla-contenedor">
+      <h2>Estado de Unidades y Viajes</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Unidad</th>
+            <th>Placas</th>
+            <th>Operador</th>
+            <th>Semáforo</th>
+            <th>Estado Viaje</th>
+            <th>Ruta</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (u of unidades; track u.idUnidad) {
+            <tr>
+              <td><strong>{{ u.numeroEconomico }}</strong><br><small>{{ u.tipoUnidad }}</small></td>
+              <td>{{ u.placas }}</td>
+              <td>{{ u.operadorAsignado }}</td>
+              <td><app-semaforo-badge [estado]="u.estadoSemaforo" /></td>
+              <td>{{ u.estadoViaje || 'Sin viaje' }}</td>
+              <td>
+                @if (u.origen && u.destino) {
+                  {{ u.origen }} → {{ u.destino }}
+                } @else {
+                  —
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

@@ -1,0 +1,26 @@
+<div class="login-contenedor">
+  <div class="tarjeta-login">
+    <h1>🚛 Logística Transportes</h1>
+    <p class="subtitulo">Iniciar Sesión</p>
+
+    <form [formGroup]="formLogin" (ngSubmit)="enviar()">
+      <div class="campo">
+        <label>Usuario</label>
+        <input type="text" formControlName="usuario" placeholder="Tu usuario" autocomplete="off">
+      </div>
+
+      <div class="campo">
+        <label>Contraseña</label>
+        <input type="password" formControlName="contrasena" placeholder="Tu contraseña">
+      </div>
+
+      @if (error) {
+        <div class="mensaje-error">{{ error }}</div>
+      }
+
+      <button type="submit" [disabled]="cargando" class="btn-ingresar">
+        {{ cargando ? 'Verificando...' : 'Ingresar' }}
+      </button>
+    </form>
+  </div>
+</div>

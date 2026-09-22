@@ -1,0 +1,73 @@
+.navbar {
+  background: linear-gradient(135deg, #0d47a1, #1976d2);
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  margin-bottom: 24px;
+}
+
+.nav-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+}
+
+.logo {
+  color: white;
+  font-size: 1.25rem;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: 8px;
+}
+
+.nav-links a {
+  color: #e3f2fd;
+  text-decoration: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.nav-links a:hover, .nav-links a.activo {
+  background-color: rgba(255,255,255,0.2);
+  color: white;
+}
+
+.usuario-menu {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.nombre {
+  color: white;
+  font-weight: 500;
+}
+
+.rol {
+  color: #bbdefb;
+  font-size: 0.85rem;
+  background: rgba(255,255,255,0.1);
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.btn-salir {
+  background: rgba(255,255,255,0.2);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-salir:hover {
+  background: rgba(255,255,255,0.3);
+}

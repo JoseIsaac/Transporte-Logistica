@@ -1,0 +1,72 @@
+<div class="contenedor">
+  <h1>🚛 Gestión de Unidades</h1>
+
+  @if (cargando) {
+    <div class="cargando">Cargando unidades...</div>
+  } @else {
+    <div class="tabla-contenedor">
+      <table>
+        <thead>
+          <tr>
+            <th>N° Económico</th>
+            <th>Marca / Modelo</th>
+            <th>Placas</th>
+            <th>Operador</th>
+            <th>Semáforo</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (u of unidades; track u.idUnidad) {
+            <tr>
+              <td><strong>{{ u.numeroEconomico }}</strong><br><small>{{ u.tipoUnidad }}</small></td>
+              <td>{{ u.marca }} {{ u.modelo }}<br><small>{{ u.anio }}</small></td>
+              <td>{{ u.placas }}</td>
+              <td>{{ u.operadorAsignado }}</td>
+              <td><app-semaforo-badge [estado]="u.estadoSemaforo" /></td>
+              <td>
+                <button class="btn-cambiar" (click)="abrirModal(u)">Cambiar Semáforo</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <!-- Modal Cambio Semáforo -->
+  @if (mostrarModal && unidadSeleccionada) {
+    <div class="modal-fondo" (click)="cerrarModal()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <h2>Cambiar Estado del Semáforo</h2>
+        <p class="referencia">Unidad: <strong>{{ unidadSeleccionada.numeroEconomico }}</strong> — Estado actual: </p>
+        <app-semaforo-badge [estado]="unidadSeleccionada.estadoSemaforo" />
+
+        <form [formGroup]="formCambio" (ngSubmit)="guardarCambio()">
+          <div class="campo">
+            <label>Nuevo Estado</label>
+            <select formControlName="nuevoEstado">
+              <option value="">Seleccionar...</option>
+              <option value="VERDE">🟢 VERDE — En servicio</option>
+              <option value="AMARILLO">🟡 AMARILLO — Revisión preventiva</option>
+              <option value="ROJO">🔴 ROJO — Fuera de servicio</option>
+            </select>
+          </div>
+
+          <div class="campo">
+            <label>Motivo del Cambio</label>
+            <textarea formControlName="motivo" rows="3" placeholder="Escribe el motivo..."></textarea>
+          </div>
+
+          @if (error) { <div class="msg-error">{{ error }}</div> }
+          @if (exito) { <div class="msg-exito">{{ exito }}</div> }
+
+          <div class="botones">
+            <button type="button" class="btn-cancelar" (click)="cerrarModal()">Cancelar</button>
+            <button type="submit" class="btn-guardar" [disabled]="formCambio.invalid">Guardar Cambios</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

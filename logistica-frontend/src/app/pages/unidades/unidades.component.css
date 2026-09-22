@@ -1,0 +1,112 @@
+.contenedor {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px 32px;
+}
+
+h1 { color: #1976d2; }
+.cargando { text-align: center; padding: 40px; color: #666; }
+
+.tabla-contenedor {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 14px 12px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+th { background: #f5f5f5; font-weight: 600; }
+tr:hover { background: #f9f9f9; }
+small { color: #777; }
+
+.btn-cambiar {
+  background: #e3f2fd;
+  color: #1565c0;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-cambiar:hover { background: #bbdefb; }
+
+/* Modal */
+.modal-fondo {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  padding: 32px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+
+.modal h2 { margin-top: 0; color: #1976d2; }
+.referencia { margin: 12px 0 4px; }
+
+.campo {
+  margin: 20px 0;
+}
+
+.campo label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.campo select, .campo textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.botones {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.btn-cancelar {
+  padding: 10px 20px;
+  border: 1px solid #ccc;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-guardar {
+  padding: 10px 20px;
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-guardar:disabled { background: #90caf9; cursor: not-allowed; }
+
+.msg-error { background: #ffebee; color: #c62828; padding: 10px; border-radius: 6px; margin: 12px 0; }
+.msg-exito { background: #e8f5e9; color: #2e7d32; padding: 10px; border-radius: 6px; margin: 12px 0; }

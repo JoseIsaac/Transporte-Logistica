@@ -1,0 +1,17 @@
+<nav class="navbar" *ngIf="authService.estaAutenticado()">
+  <div class="nav-container">
+    <a routerLink="/panel" class="logo">🚛 Logística Transportes</a>
+    
+    <div class="nav-links">
+      <a routerLink="/panel" routerLinkActive="activo">Panel</a>
+      <a routerLink="/unidades" routerLinkActive="activo">Unidades</a>
+      <a routerLink="/viajes" routerLinkActive="activo">Viajes</a>
+    </div>
+
+    <div class="usuario-menu">
+      <span class="nombre">{{ usuario?.nombreCompleto }}</span>
+      <span class="rol">{{ usuario?.rol }}</span>
+      <button (click)="cerrarSesion()" class="btn-salir">Cerrar Sesión</button>
+    </div>
+  </div>
+</nav>

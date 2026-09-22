@@ -1,0 +1,128 @@
+<div class="contenedor">
+  <div class="cabecera">
+    <h1>🚛 Gestión de Viajes</h1>
+    <button class="btn-primario" (click)="abrirModalCrear()">+ Nuevo Viaje</button>
+  </div>
+
+  @if (cargando) {
+    <div class="cargando">Cargando viajes...</div>
+  } @else {
+    <div class="tabla-contenedor">
+      <h2>Viajes Activos — En Ruta</h2>
+      @if (viajesActivos.length === 0) {
+        <p class="sin-datos">No hay viajes en este momento.</p>
+      } @else {
+        <table>
+          <thead>
+            <tr>
+              <th>Unidad</th>
+              <th>Ruta</th>
+              <th>Salida</th>
+              <th>Llegada Est.</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (v of viajesActivos; track v.idViaje) {
+              <tr>
+                <td><strong>{{ v.unidad.numeroEconomico }}</strong></td>
+                <td>{{ v.origen }} → {{ v.destino }}</td>
+                <td>{{ v.fechaSalida | slice:0:16 }}</td>
+                <td>{{ v.fechaLlegadaEstimada | slice:0:16 }}</td>
+                <td><span class="estado-viaje">{{ v.estadoViaje }}</span></td>
+                <td><button class="btn-estado" (click)="abrirModalEstado(v)">Cambiar Estado</button></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  }
+
+  <!-- Modal Nuevo Viaje -->
+  @if (mostrarModalCrear) {
+    <div class="modal-fondo" (click)="cerrarModales()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <h2>Crear Nuevo Viaje</h2>
+        <form [formGroup]="formCrear" (ngSubmit)="crearViaje()">
+          <div class="fila">
+            <div class="campo">
+              <label>Unidad</label>
+              <select formControlName="idUnidad">
+                <option value="">Seleccionar...</option>
+                @for (u of unidades; track u.idUnidad) {
+                  <option [value]="u.idUnidad">{{ u.numeroEconomico }} — {{ u.placas }}</option>
+                }
+              </select>
+            </div>
+          </div>
+          <div class="fila">
+            <div class="campo">
+              <label>Origen</label>
+              <input type="text" formControlName="origen" placeholder="Ciudad, Estado">
+            </div>
+            <div class="campo">
+              <label>Destino</label>
+              <input type="text" formControlName="destino" placeholder="Ciudad, Estado">
+            </div>
+          </div>
+          <div class="fila">
+            <div class="campo">
+              <label>Fecha y Hora de Salida</label>
+              <input type="datetime-local" formControlName="fechaSalida">
+            </div>
+            <div class="campo">
+              <label>Llegada Estimada</label>
+              <input type="datetime-local" formControlName="fechaLlegadaEstimada">
+            </div>
+          </div>
+          <div class="campo">
+            <label>Observaciones</label>
+            <textarea formControlName="observaciones" rows="2"></textarea>
+          </div>
+          @if (error) { <div class="msg-error">{{ error }}</div> }
+          @if (exito) { <div class="msg-exito">{{ exito }}</div> }
+          <div class="botones">
+            <button type="button" class="btn-cancelar" (click)="cerrarModales()">Cancelar</button>
+            <button type="submit" class="btn-guardar" [disabled]="formCrear.invalid">Crear Viaje</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- Modal Cambiar Estado -->
+  @if (mostrarModalEstado && viajeSeleccionado) {
+    <div class="modal-fondo" (click)="cerrarModales()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <h2>Cambiar Estado del Viaje</h2>
+        <p class="viaje-ref">{{ viajeSeleccionado.origen }} → {{ viajeSeleccionado.destino }}</p>
+        <p>Estado actual: <strong>{{ viajeSeleccionado.estadoViaje }}</strong></p>
+        <form [formGroup]="formEstado" (ngSubmit)="cambiarEstado()">
+          <div class="campo">
+            <label>Nuevo Estado</label>
+            <select formControlName="nuevoEstado">
+              <option value="">Seleccionar...</option>
+              <option value="EN_ESPERA">⏳ En Espera</option>
+              <option value="EN_RUTA">🚛 En Ruta</option>
+              <option value="EN_DESCARGA">📦 En Descarga</option>
+              <option value="FINALIZADO">✅ Finalizado</option>
+              <option value="RETRASADO">⚠️ Retrasado</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label>Observaciones</label>
+            <textarea formControlName="observaciones" rows="2"></textarea>
+          </div>
+          @if (error) { <div class="msg-error">{{ error }}</div> }
+          @if (exito) { <div class="msg-exito">{{ exito }}</div> }
+          <div class="botones">
+            <button type="button" class="btn-cancelar" (click)="cerrarModales()">Cancelar</button>
+            <button type="submit" class="btn-guardar" [disabled]="formEstado.invalid">Actualizar Estado</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>
