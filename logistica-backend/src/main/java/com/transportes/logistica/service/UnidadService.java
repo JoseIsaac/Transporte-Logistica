@@ -58,7 +58,7 @@ public class UnidadService {
         resumen.put("VERDE", unidadRepository.countByEstadoSemaforoAndActivoTrue(EstadoSemaforo.VERDE));
         resumen.put("AMARILLO", unidadRepository.countByEstadoSemaforoAndActivoTrue(EstadoSemaforo.AMARILLO));
         resumen.put("ROJO", unidadRepository.countByEstadoSemaforoAndActivoTrue(EstadoSemaforo.ROJO));
-        resumen.put("TOTAL", unidadRepository.findByActivoTrue().size());
+        resumen.put("TOTAL", unidadRepository.findByActivoTrue().size() + 0L); // ← Corregido
         return resumen;
     }
     
