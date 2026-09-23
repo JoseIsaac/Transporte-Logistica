@@ -1,36 +1,30 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { UnidadService } from '../../core/services/unidad.service';
-import { UnidadPanelDTO, ResumenSemaforo } from '../../core/models/unidad.model';
-import { SemaforoBadgeComponent } from '../../shared/semaforo-badge/semaforo-badge.component';
 
 @Component({
   selector: 'app-panel',
   standalone: true,
-  imports: [CommonModule, SemaforoBadgeComponent],
+  imports: [CommonModule],
   templateUrl: './panel.component.html',
-  styleUrl: './panel.component.css'
+  styleUrls: ['./panel.component.css']
 })
 export class PanelComponent implements OnInit {
-  unidades: UnidadPanelDTO[] = [];
-  resumen!: ResumenSemaforo;
-  cargando = true;
+  loading = true;
+  
+  vehiculosActivos = 0;
+  rutasActivas = 0;
+  entregasHoy = 0;
+  incidencias = 0;
 
-  constructor(private unidadService: UnidadService) {}
-
-  ngOnInit() {
-    this.cargarDatos();
-  }
-
-  cargarDatos() {
-    this.cargando = true;
-    this.unidadService.obtenerResumen().subscribe(res => this.resumen = res);
-    this.unidadService.obtenerPanel().subscribe({
-      next: datos => {
-        this.unidades = datos;
-        this.cargando = false;
-      },
-      error: () => this.cargando = false
-    });
+  ngOnInit(): void {
+    console.log('✅ Iniciando carga...'); // Para depurar
+    setTimeout(() => {
+      this.vehiculosActivos = 24;
+      this.rutasActivas = 12;
+      this.entregasHoy = 47;
+      this.incidencias = 2;
+      this.loading = false;
+      console.log('✅ Datos cargados, loading =', this.loading);
+    }, 2000);
   }
 }
