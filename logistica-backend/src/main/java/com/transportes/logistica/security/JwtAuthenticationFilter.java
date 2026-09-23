@@ -12,7 +12,6 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import java.io.IOException;
 
 @Component
@@ -27,7 +26,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest solicitud,
                                     HttpServletResponse respuesta,
-                                    FilterChain cadena) throws ServletException, IOException {
+                                    FilterChain cadena)
+            throws ServletException, IOException {
+
+        // ✅ Saltar rutas de autenticación
+        String ruta = solicitud.getRequestURI();
+        if (ruta.startsWith("/api/auth/")) {
+            cadena.doFilter(solicitud, respuesta);
+            return;
+        }
 
         final String encabezadoAuth = solicitud.getHeader("Authorization");
         String token = null;
@@ -40,18 +47,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (nombreUsuario != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails detallesUsuario = servicioUsuario.loadUserByUsername(nombreUsuario);
-
             if (jwtUtil.validarToken(token, detallesUsuario)) {
                 UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(
-                                detallesUsuario,
-                                null,
-                                detallesUsuario.getAuthorities()
-                        );
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(solicitud));
+                    new UsernamePasswordAuthenticationToken(
+                        detallesUsuario,
+                        null,
+                        detallesUsuario.getAuthorities()
+                    );
+                authToken.setDetails(new WebAuthenticationDetailsSource()
+                    .buildDetails(solicitud));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
+
         cadena.doFilter(solicitud, respuesta);
     }
 }

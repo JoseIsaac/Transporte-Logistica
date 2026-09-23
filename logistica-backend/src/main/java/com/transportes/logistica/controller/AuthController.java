@@ -1,11 +1,10 @@
 package com.transportes.logistica.controller;
 
-import com.transportes.logistica.dto.LoginDTO;
+import com.transportes.logistica.dto.LoginRequest;
 import com.transportes.logistica.dto.RespuestaAuthDTO;
 import com.transportes.logistica.entity.Usuario;
 import com.transportes.logistica.repository.UsuarioRepository;
 import com.transportes.logistica.security.JwtUtil;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,27 +27,29 @@ public class AuthController {
     private UsuarioRepository usuarioRepository;
 
     @PostMapping("/login")
-    public ResponseEntity<RespuestaAuthDTO> login(@Valid @RequestBody LoginDTO dto) {
-
+    public ResponseEntity<RespuestaAuthDTO> login(@RequestBody LoginRequest datos) {
         Authentication autenticacion = gestorAutenticacion.authenticate(
-                new UsernamePasswordAuthenticationToken(dto.getUsuario(), dto.getContrasena())
+            new UsernamePasswordAuthenticationToken(
+                datos.getUsuario(),
+                datos.getContrasena()
+            )
         );
 
-        Usuario usuario = usuarioRepository.findByUsuarioAndActivoTrue(dto.getUsuario())
-                .orElseThrow();
+        Usuario usuario = usuarioRepository.findByUsuarioAndActivoTrue(datos.getUsuario())
+            .orElseThrow();
 
         String token = jwtUtil.generarToken(
-                usuario.getUsuario(),
-                usuario.getRol().getNombre(),
-                usuario.getIdUsuario()
+            usuario.getUsuario(),
+            usuario.getRol().getNombre(),
+            usuario.getIdUsuario()
         );
 
         RespuestaAuthDTO respuesta = new RespuestaAuthDTO(
-                token,
-                "Bearer",
-                usuario.getNombreCompleto(),
-                usuario.getRol().getNombre(),
-                usuario.getIdUsuario()
+            token,
+            "Bearer",
+            usuario.getNombreCompleto(),
+            usuario.getRol().getNombre(),
+            usuario.getIdUsuario()
         );
 
         return ResponseEntity.ok(respuesta);

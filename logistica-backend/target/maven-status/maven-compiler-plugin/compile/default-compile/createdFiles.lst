@@ -1,6 +1,7 @@
 com\transportes\logistica\dto\UnidadPanelDTO.class
 com\transportes\logistica\repository\HistorialSemaforoRepository.class
 com\transportes\logistica\entity\Usuario.class
+com\transportes\logistica\dto\LoginRequest.class
 com\transportes\logistica\enums\TipoUnidad.class
 com\transportes\logistica\security\JwtUtil.class
 com\transportes\logistica\security\UserDetailsServiceImpl.class
