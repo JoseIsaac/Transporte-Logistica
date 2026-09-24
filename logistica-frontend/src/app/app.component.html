@@ -1,15 +1,39 @@
-<header class="encabezado-principal">
-  <h1>🚚 Sistema de Logística de Transportes</h1>
-  <div class="usuario">Administrador</div>
+<!-- Barra superior FIJA -->
+<header class="barra-superior">
+  <div class="izquierda">
+    <h1 class="titulo-sistema">🚚 Sistema de Logística de Transportes</h1>
+  </div>
+  <div class="derecha">
+    <span class="usuario-actual">Administrador</span>
+  </div>
 </header>
 
-<!-- ✅ MENÚ DE NAVEGACIÓN → Aquí vas a poder cambiar de página -->
-<nav class="menu-navegacion">
-  <a routerLink="/" routerLinkActive="activo">📊 Panel de Control</a>
-  <a routerLink="/unidades" routerLinkActive="activo">🚛 Unidades / Flota</a>
-  <!-- Más enlaces aquí después -->
+<!-- Menú de navegación FIJO -->
+<nav class="menu-principal">
+  <a routerLink="/panel" routerLinkActive="activo" class="enlace-modulo">
+    📊 Panel de Control
+  </a>
+  <a routerLink="/unidades" routerLinkActive="activo" class="enlace-modulo">
+    🚛 Unidades / Flota
+  </a>
+  <a routerLink="/rutas" routerLinkActive="activo" class="enlace-modulo">
+    🛣️ Rutas
+  </a>
+  <a routerLink="/viajes" routerLinkActive="activo" class="enlace-modulo">
+    🚚 Viajes
+  </a>
+  <a routerLink="/operadores" routerLinkActive="activo" class="enlace-modulo">
+    👷 Operadores
+  </a>
+  <a routerLink="/reportes" routerLinkActive="activo" class="enlace-modulo">
+    📈 Reportes
+  </a>
+  <a routerLink="/usuarios" routerLinkActive="activo" class="enlace-modulo">
+    👤 Usuarios
+  </a>
 </nav>
 
-<main class="contenido">
-  <router-outlet /> <!-- Aquí se carga la página seleccionada -->
+<!-- Contenido que se desplaza -->
+<main class="contenido-pagina">
+  <router-outlet />
 </main>

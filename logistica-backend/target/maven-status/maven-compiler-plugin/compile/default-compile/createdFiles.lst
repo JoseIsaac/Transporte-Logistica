@@ -12,7 +12,6 @@ com\transportes\logistica\enums\EstadoSemaforo.class
 com\transportes\logistica\entity\Mantenimiento.class
 com\transportes\logistica\repository\ViajeRepository.class
 com\transportes\logistica\dto\LoginDTO.class
-com\transportes\logistica\service\ViajeService.class
 com\transportes\logistica\enums\EstadoViaje.class
 com\transportes\logistica\repository\HistorialEstadoViajeRepository.class
 com\transportes\logistica\entity\Unidad.class
@@ -20,7 +19,6 @@ com\transportes\logistica\service\SemaforoService.class
 com\transportes\logistica\dto\CambioSemaforoDTO.class
 com\transportes\logistica\controller\SemaforoController.class
 com\transportes\logistica\dto\RespuestaAuthDTO.class
-com\transportes\logistica\service\UnidadService.class
 com\transportes\logistica\entity\HistorialSemaforo.class
 com\transportes\logistica\entity\Viaje.class
 com\transportes\logistica\security\SecurityConfig.class
@@ -31,6 +29,4 @@ com\transportes\logistica\dto\CambioEstadoViajeDTO.class
 com\transportes\logistica\enums\TipoMantenimiento.class
 com\transportes\logistica\repository\UnidadRepository.class
 com\transportes\logistica\controller\PanelController.class
-com\transportes\logistica\controller\UnidadController.class
-com\transportes\logistica\controller\ViajeController.class
 com\transportes\logistica\dto\ViajeDTO.class

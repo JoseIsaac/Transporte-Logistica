@@ -9,12 +9,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "unidades")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // ✅ Agrega esto
 public class Unidad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
