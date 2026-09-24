@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UnidadService } from '../../core/services/unidad.service';
-import { Unidad, EstadoSemaforo, EstadoViaje } from '../../core/models/unidad.model';
+import { Unidad, UnidadPanelDTO, EstadoSemaforo, EstadoViaje } from '../../core/models/unidad.model';
 import { AuthService } from '../../core/services/auth.service';
 import { SemaforoBadgeComponent } from '../../shared/semaforo-badge/semaforo-badge.component';
 
@@ -18,16 +18,16 @@ interface ResumenSemaforo {
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, SemaforoBadgeComponent],
   templateUrl: './unidades.component.html',
-  styleUrl: './unidades.component.css'
+  styleUrls: ['./unidades.component.css'] // ✅ AQUÍ → con "s"
 })
 export class UnidadesComponent implements OnInit {
   unidades: Unidad[] = [];
-  unidadesPanel: any[] = [];
+  unidadesPanel: UnidadPanelDTO[] = []; // ✅ Tipado fuerte
   resumen: ResumenSemaforo = { VERDE: 0, AMARILLO: 0, ROJO: 0, TOTAL: 0 };
   cargando = true;
   formCambio!: FormGroup;
   mostrarModal = false;
-  unidadSeleccionada!: Unidad | null;
+  unidadSeleccionada: Unidad | UnidadPanelDTO | null = null; // ✅ Acepta ambos tipos
   error = '';
   exito = '';
   filtro: string = 'todas';
@@ -35,83 +35,114 @@ export class UnidadesComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private unidadService: UnidadService,
-    private authService: AuthService
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef // ✅ Para asegurar actualización de vista
   ) {}
 
   ngOnInit() {
-    this.cargarUnidades();
-    this.cargarResumen();
+    this.cargarTodo();
     this.formCambio = this.fb.group({
       nuevoEstado: ['', Validators.required],
       motivo: ['', Validators.required]
     });
   }
 
-  cargarUnidades() {
+  cargarTodo(): void {
     this.cargando = true;
+
+    // Cargar lista completa
     this.unidadService.obtenerTodas().subscribe({
       next: (datos) => {
         this.unidades = datos;
-        this.cargando = false;
+        this.finalizarCarga();
       },
-      error: () => this.cargando = false
+      error: () => this.finalizarCarga()
     });
 
+    // Cargar datos del panel con origen/destino
     this.unidadService.obtenerPanel().subscribe({
       next: (datos) => {
         this.unidadesPanel = datos;
+        this.finalizarCarga();
       },
-      error: (err) => console.error('Error al cargar panel:', err)
+      error: (err) => {
+        console.error('Error al cargar panel:', err);
+        this.finalizarCarga();
+      }
+    });
+
+    // Cargar resumen de semáforo
+    this.unidadService.obtenerResumenSemaforo().subscribe({
+      next: (datos) => {
+        this.resumen = datos;
+        this.cdr.markForCheck();
+      },
+      error: (err) => console.error('Error al cargar resumen:', err)
     });
   }
 
-  cargarResumen() {
-    this.unidadService.obtenerResumenSemaforo().subscribe({
-      next: (datos) => { this.resumen = datos; },
-      error: (err) => console.error('Error al cargar resumen:', err)
-    });
+  private contadorCargas = 0;
+  private finalizarCarga(): void {
+    this.contadorCargas++;
+    if (this.contadorCargas >= 2) { // Esperamos ambas llamadas
+      this.cargando = false;
+      this.cdr.markForCheck();
+      this.cdr.detectChanges();
+    }
   }
 
   filtrar(estado: string) {
     this.filtro = estado;
   }
 
-  get unidadesFiltradas(): any[] {
+  get unidadesFiltradas(): (Unidad | UnidadPanelDTO)[] {
     const lista = this.unidadesPanel.length > 0 ? this.unidadesPanel : this.unidades;
+    
     if (this.filtro === 'todas') return lista;
+    
     if (['VERDE', 'AMARILLO', 'ROJO'].includes(this.filtro)) {
       return lista.filter(u => u.estadoSemaforo === this.filtro);
     }
-    // ✅ Filtramos por estadoViaje
+    
     if (['EN_ESPERA', 'EN_RUTA', 'EN_DESCARGA', 'FINALIZADO', 'RETRASADO'].includes(this.filtro)) {
-      return this.unidadesPanel.filter(u => u.estadoViaje === this.filtro);
+      return lista.filter(u => u.estadoViaje === this.filtro);
     }
+    
     return lista;
   }
 
-  // ✅ Cambiado de estadoViaje → estadoRuta
-  getEstadoRutaTexto(estado: string | undefined): string {
+  getEstadoViajeTexto(estado?: string): string {
     if (!estado) return 'Sin asignar';
-    return estado.replace('_', ' ');
+    const textos: Record<string, string> = {
+      EN_ESPERA: 'En Espera',
+      EN_RUTA: 'En Ruta',
+      EN_DESCARGA: 'En Descarga',
+      FINALIZADO: 'Finalizado',
+      RETRASADO: 'Retrasado'
+    };
+    return textos[estado] || estado.replace('_', ' ');
   }
 
-  getEstadoRutaIcono(estado: string | undefined): string {
-    switch (estado) {
-      case 'EN_ESPERA': return '⏳';
-      case 'EN_RUTA': return '🚛';
-      case 'EN_DESCARGA': return '📦';
-      case 'FINALIZADO': return '✅';
-      case 'RETRASADO': return '⚠️';
-      default: return '—';
-    }
+  getEstadoViajeIcono(estado?: string): string {
+    const iconos: Record<string, string> = {
+      EN_ESPERA: '⏳',
+      EN_RUTA: '🚛',
+      EN_DESCARGA: '📦',
+      FINALIZADO: '✅',
+      RETRASADO: '⚠️'
+    };
+    return estado ? (iconos[estado] || '—') : '—';
   }
 
-  formatearFecha(fecha: string | undefined): string {
+  formatearFecha(fecha?: string): string {
     if (!fecha) return '—';
-    return new Date(fecha).toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' });
+    return new Date(fecha).toLocaleString('es-MX', { 
+      dateStyle: 'short', 
+      timeStyle: 'short' 
+    });
   }
 
-  abrirModal(unidad: Unidad) {
+  abrirModal(unidad: Unidad | UnidadPanelDTO) {
     this.unidadSeleccionada = unidad;
     this.formCambio.reset();
     this.mostrarModal = true;
@@ -126,8 +157,13 @@ export class UnidadesComponent implements OnInit {
 
   guardarCambio() {
     if (this.formCambio.invalid || !this.unidadSeleccionada) return;
+
     const usuario = this.authService.getUsuario();
-    if (!usuario) return;
+    if (!usuario) {
+      this.error = 'No hay sesión activa';
+      return;
+    }
+
     this.error = '';
     this.exito = '';
 
@@ -140,13 +176,13 @@ export class UnidadesComponent implements OnInit {
       }
     ).subscribe({
       next: () => {
-        this.exito = 'Estado actualizado correctamente';
-        this.cargarUnidades();
-        this.cargarResumen();
-        setTimeout(() => this.cerrarModal(), 1200);
+        this.exito = '✅ Estado actualizado correctamente';
+        this.contadorCargas = 0;
+        this.cargarTodo();
+        setTimeout(() => this.cerrarModal(), 1500);
       },
       error: (err) => {
-        this.error = err.error?.message || 'No se pudo actualizar el estado';
+        this.error = err.error?.message || '❌ No se pudo actualizar el estado';
       }
     });
   }

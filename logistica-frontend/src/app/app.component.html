@@ -1,4 +1,15 @@
-@if (authService.estaAutenticado()) {
-  <app-navbar></app-navbar>
-}
-<router-outlet></router-outlet>
+<header class="encabezado-principal">
+  <h1>🚚 Sistema de Logística de Transportes</h1>
+  <div class="usuario">Administrador</div>
+</header>
+
+<!-- ✅ MENÚ DE NAVEGACIÓN → Aquí vas a poder cambiar de página -->
+<nav class="menu-navegacion">
+  <a routerLink="/" routerLinkActive="activo">📊 Panel de Control</a>
+  <a routerLink="/unidades" routerLinkActive="activo">🚛 Unidades / Flota</a>
+  <!-- Más enlaces aquí después -->
+</nav>
+
+<main class="contenido">
+  <router-outlet /> <!-- Aquí se carga la página seleccionada -->
+</main>

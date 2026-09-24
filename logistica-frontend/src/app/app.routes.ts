@@ -1,7 +1,13 @@
 import { Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
+import { UnidadesComponent } from './pages/unidades/unidades.component';
+import { PanelComponent } from './pages/panel/panel.component';
+
 
 export const routes: Routes = [
+  { path: '', component: PanelComponent },
+  { path: 'unidades', component: UnidadesComponent },
+  { path: '**', redirectTo: '' },
   { 
     path: 'login', 
     loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent) 

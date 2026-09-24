@@ -5,27 +5,33 @@ export type EstadoViaje = 'EN_ESPERA' | 'EN_RUTA' | 'EN_DESCARGA' | 'FINALIZADO'
 export interface Unidad {
   idUnidad: number;
   numeroEconomico: string;
-  tipoUnidad: string;
+  tipoUnidad: TipoUnidad | string;
+  marca?: string;
+  modelo?: string;
+  anio?: number;
   placas: string;
+  numeroSerie?: string;
   operadorAsignado?: string;
   estadoSemaforo?: EstadoSemaforo;
   observacionesSemaforo?: string;
-  estadoViaje?: EstadoViaje; // ✅ NO EstadoRuta
+  estadoViaje?: EstadoViaje;
   origen?: string;
   destino?: string;
   fechaSalida?: string;
   fechaLlegadaEstimada?: string;
+  fechaIngreso?: string;
+  activo?: boolean;
 }
 
 export interface UnidadPanelDTO {
   idUnidad: number;
   numeroEconomico: string;
-  tipoUnidad: TipoUnidad;
+  tipoUnidad: TipoUnidad | string;
   placas: string;
-  operadorAsignado: string;
-  estadoSemaforo: EstadoSemaforo;
+  operadorAsignado?: string;
+  estadoSemaforo?: EstadoSemaforo;
   observacionesSemaforo?: string;
-  estadoViaje?: EstadoViaje; // ✅ De vuelta a estadoViaje
+  estadoViaje?: EstadoViaje;
   origen?: string;
   destino?: string;
   fechaSalida?: string;

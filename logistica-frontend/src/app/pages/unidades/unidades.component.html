@@ -1,6 +1,7 @@
 <div class="contenedor">
   <h1>🚛 Gestión de Unidades</h1>
 
+  <!-- Resumen Semáforo -->
   <div class="resumen-semaforo">
     <div class="tarjeta-resumen verde">
       <span class="numero">{{ resumen.VERDE }}</span>
@@ -20,107 +21,121 @@
     </div>
   </div>
 
+  <!-- Filtros -->
   <div class="filtros">
     <button class="btn-filtro" [class.activo]="filtro === 'todas'" (click)="filtrar('todas')">Todas</button>
     <button class="btn-filtro" [class.activo]="filtro === 'VERDE'" (click)="filtrar('VERDE')">🟢 Operación</button>
     <button class="btn-filtro" [class.activo]="filtro === 'AMARILLO'" (click)="filtrar('AMARILLO')">🟡 Revisión</button>
-    <button class="btn-filtro" [class.activo]="filtro === 'ROJO'" (click)="filtrar('ROJO')">🔴 Fuera de Servicio</button>
+    <button class="btn-filtro" [class.activo]="filtro === 'ROJO'" (click)="filtrar('ROJO')">🔴 Fuera de
+      Servicio</button>
     <button class="btn-filtro" [class.activo]="filtro === 'EN_RUTA'" (click)="filtrar('EN_RUTA')">🚛 En Ruta</button>
-    <button class="btn-filtro" [class.activo]="filtro === 'EN_ESPERA'" (click)="filtrar('EN_ESPERA')">⏳ En Espera</button>
+    <button class="btn-filtro" [class.activo]="filtro === 'EN_ESPERA'" (click)="filtrar('EN_ESPERA')">⏳ En
+      Espera</button>
   </div>
 
+  <!-- Tabla -->
   @if (cargando) {
-    <div class="cargando">Cargando unidades...</div>
+  <div class="cargando">Cargando unidades...</div>
   } @else {
-    <div class="tabla-contenedor">
-      <table>
-        <thead>
-          <tr>
-            <th>N° Económico</th>
-            <th>Marca / Modelo</th>
-            <th>Placas</th>
-            <th>Operador</th>
-            <th>Origen → Destino</th>
-            <th>Estado Ruta</th>
-            <th>Semáforo</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (u of unidadesFiltradas; track u.idUnidad) {
-            <tr>
-              <td>
-                <strong>{{ u.numeroEconomico }}</strong><br>
-                <small>{{ u.tipoUnidad?.replace('_', ' ') }}</small>
-              </td>
-              <td>{{ u.marca }} {{ u.modelo }}<br><small>{{ u.anio }}</small></td>
-              <td>{{ u.placas }}</td>
-              <td>{{ u.operadorAsignado || 'Sin asignar' }}</td>
-              <td>
-                @if (u.origen || u.destino) {
-                  <span class="ruta-celda">{{ u.origen || '—' }} → {{ u.destino || '—' }}</span>
-                } @else {
-                  <span class="sin-datos">Sin asignar</span>
-                }
-              </td>
-              <!-- ✅ Cambiado: u.estadoViaje -->
-              <td>
-                <span class="estado-ruta-celda">
-                  {{ getEstadoRutaIcono(u.estadoViaje) }}
-                  {{ getEstadoRutaTexto(u.estadoViaje) }}
-                </span>
-                @if (u.fechaSalida) {
-                  <small class="fecha-celda">Sal: {{ formatearFecha(u.fechaSalida) }}</small>
-                }
-              </td>
-              <td><app-semaforo-badge [estado]="u.estadoSemaforo" /></td>
-              <td>
-                <button class="btn-cambiar" (click)="abrirModal(u)">Cambiar Semáforo</button>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
+  <div class="tabla-contenedor">
+    <table>
+      <thead>
+        <tr>
+          <th>N° Económico</th>
+          <th>Marca / Modelo</th>
+          <th>Placas</th>
+          <th>Operador</th>
+          <th>Origen → Destino</th>
+          <th>Estado de Viaje</th>
+          <th>Semáforo</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (u of unidadesFiltradas; track u.idUnidad) {
+        <tr>
+          <td>
+            <strong>{{ u.numeroEconomico }}</strong><br>
+            <small>{{ u.tipoUnidad?.replace('_', ' ') }}</small>
+          </td>
+          <td>
+            @if ('marca' in u) {
+            {{ u.marca }} {{ u.modelo || '' }}
+            @if (u.anio) { <br><small>{{ u.anio }}</small> }
+            } @else {
+            —
+            }
+          </td>
+          <td>{{ u.placas }}</td>
+          <td>{{ u.operadorAsignado || 'Sin asignar' }}</td>
+          <td>
+            @if (u.origen || u.destino) {
+            <span class="ruta-celda">{{ u.origen || '—' }} → {{ u.destino || '—' }}</span>
+            } @else {
+            <span class="sin-datos">Sin asignar</span>
+            }
+          </td>
+          <td>
+            <span class="estado-ruta-celda">
+              {{ getEstadoViajeIcono(u.estadoViaje) }}
+              {{ getEstadoViajeTexto(u.estadoViaje) }}
+            </span>
+            @if (u.fechaSalida) {
+            <small class="fecha-celda">Sal: {{ formatearFecha(u.fechaSalida) }}</small>
+            }
+          </td>
+          <td><app-semaforo-badge [estado]="u.estadoSemaforo" /></td>
+          <td>
+            <button class="btn-cambiar" (click)="abrirModal(u)">Cambiar Semáforo</button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
 
-      @if (unidadesFiltradas.length === 0) {
-        <div class="sin-resultados">
-          No hay unidades que coincidan con el filtro seleccionado.
-        </div>
-      }
+    @if (unidadesFiltradas.length === 0) {
+    <div class="sin-resultados">
+      No hay unidades que coincidan con el filtro seleccionado.
     </div>
+    }
+  </div>
   }
 
-  <!-- Modal — sin cambios -->
+  <!-- Modal Cambio Semáforo -->
   @if (mostrarModal && unidadSeleccionada) {
-    <div class="modal-fondo" (click)="cerrarModal()">
-      <div class="modal" (click)="$event.stopPropagation()">
-        <h2>Cambiar Estado del Semáforo</h2>
-        <p class="referencia">
-          Unidad: <strong>{{ unidadSeleccionada.numeroEconomico }}</strong> — Estado actual:
-        </p>
-        <app-semaforo-badge [estado]="unidadSeleccionada?.estadoSemaforo ?? 'VERDE'" />
-        <form [formGroup]="formCambio" (ngSubmit)="guardarCambio()">
-          <div class="campo">
-            <label>Nuevo Estado</label>
-            <select formControlName="nuevoEstado">
-              <option value="">Seleccionar...</option>
-              <option value="VERDE">🟢 VERDE — En servicio</option>
-              <option value="AMARILLO">🟡 AMARILLO — Revisión preventiva</option>
-              <option value="ROJO">🔴 ROJO — Fuera de servicio</option>
-            </select>
-          </div>
-          <div class="campo">
-            <label>Motivo del Cambio</label>
-            <textarea formControlName="motivo" rows="3" placeholder="Escribe el motivo..."></textarea>
-          </div>
-          @if (error) { <div class="msg-error">{{ error }}</div> }
-          @if (exito) { <div class="msg-exito">{{ exito }}</div> }
-          <div class="botones">
-            <button type="button" class="btn-cancelar" (click)="cerrarModal()">Cancelar</button>
-            <button type="submit" class="btn-guardar" [disabled]="formCambio.invalid">Guardar Cambios</button>
-          </div>
-        </form>
-      </div>
+  <div class="modal-fondo" (click)="cerrarModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>Cambiar Estado del Semáforo</h2>
+      <p class="referencia">
+        Unidad: <strong>{{ unidadSeleccionada.numeroEconomico }}</strong> — Estado actual:
+      </p>
+      <app-semaforo-badge [estado]="unidadSeleccionada.estadoSemaforo ?? 'VERDE'" />
+
+      <form [formGroup]="formCambio" (ngSubmit)="guardarCambio()">
+        <div class="campo">
+          <label>Nuevo Estado</label>
+          <select formControlName="nuevoEstado">
+            <option value="">Seleccionar...</option>
+            <option value="VERDE">🟢 VERDE — En servicio</option>
+            <option value="AMARILLO">🟡 AMARILLO — Revisión preventiva</option>
+            <option value="ROJO">🔴 ROJO — Fuera de servicio</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label>Motivo del Cambio</label>
+          <textarea formControlName="motivo" rows="3" placeholder="Escribe el motivo..."></textarea>
+        </div>
+
+        @if (error) { <div class="msg-error">{{ error }}</div> }
+        @if (exito) { <div class="msg-exito">{{ exito }}</div> }
+
+        <div class="botones">
+          <button type="button" class="btn-cancelar" (click)="cerrarModal()">Cancelar</button>
+          <button type="submit" class="btn-guardar" [disabled]="formCambio.invalid">Guardar Cambios</button>
+        </div>
+      </form>
     </div>
+  </div>
   }
 </div>

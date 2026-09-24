@@ -1,15 +1,15 @@
 .contenedor {
-  max-width: 1200px;
+  padding: 1.5rem;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 0 24px 32px;
 }
 
-h1 { 
-  color: #1976d2; 
-  margin-bottom: 1.5rem;
+.contenedor h1 {
+  margin: 0 0 1.5rem 0;
+  color: #0f172a;
 }
 
-/* ✅ Resumen Semáforo */
+/* Resumen Semáforo */
 .resumen-semaforo {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -18,69 +18,55 @@ h1 {
 }
 
 .tarjeta-resumen {
-  background: white;
+  padding: 1rem 1.25rem;
   border-radius: 10px;
-  padding: 1rem;
   text-align: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-  border-top: 3px solid;
 }
-
-.tarjeta-resumen.verde { border-top-color: #4caf50; }
-.tarjeta-resumen.amarillo { border-top-color: #ffc107; }
-.tarjeta-resumen.rojo { border-top-color: #f44336; }
-.tarjeta-resumen.total { border-top-color: #1976d2; }
+.tarjeta-resumen.verde { background: #d4edda; border: 1px solid #c3e6cb; }
+.tarjeta-resumen.amarillo { background: #fff3cd; border: 1px solid #ffeeba; }
+.tarjeta-resumen.rojo { background: #f8d7da; border: 1px solid #f5c6cb; }
+.tarjeta-resumen.total { background: #e2e3e5; border: 1px solid #d6d8db; }
 
 .tarjeta-resumen .numero {
   display: block;
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #263238;
+  font-size: 1.8rem;
+  font-weight: bold;
+  line-height: 1;
   margin-bottom: 0.25rem;
 }
-
 .tarjeta-resumen .etiqueta {
   font-size: 0.85rem;
-  color: #607d8b;
+  color: #333;
 }
 
-/* ✅ Filtros */
+/* Filtros */
 .filtros {
   display: flex;
-  gap: 0.6rem;
-  margin-bottom: 1.5rem;
   flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .btn-filtro {
-  padding: 0.6rem 1rem;
-  border: none;
+  padding: 0.5rem 1rem;
+  border: 1px solid #cbd5e1;
+  background: white;
   border-radius: 6px;
-  background: white;
-  color: #546e7a;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   transition: all 0.2s;
-  font-size: 0.9rem;
 }
-
-.btn-filtro:hover,
 .btn-filtro.activo {
-  background: #1976d2;
+  background: #3b82f6;
   color: white;
+  border-color: #3b82f6;
 }
 
-.cargando { 
-  text-align: center; 
-  padding: 40px; 
-  color: #666; 
-}
-
+/* Tabla */
 .tabla-contenedor {
+  overflow-x: auto;
   background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
 table {
@@ -89,66 +75,52 @@ table {
 }
 
 th, td {
-  padding: 14px 12px;
+  padding: 0.9rem;
   text-align: left;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #f1f5f9;
 }
 
-th { 
-  background: #f5f5f5; 
-  font-weight: 600; 
+th {
+  background: #f8fafc;
+  font-weight: 600;
+  color: #475569;
+  font-size: 0.85rem;
 }
 
-tr:hover { 
-  background: #f9f9f9; 
+td small {
+  color: #94a3b8;
+  font-size: 0.75rem;
 }
 
-small { 
-  color: #777; 
-}
-
-/* ✅ Estilos para nuevas columnas */
-.ruta-celda {
-  color: #2e7d32;
-  font-weight: 500;
-}
-
-.sin-datos {
-  color: #999;
-  font-style: italic;
-}
-
-.estado-ruta-celda { /* ✅ antes era estado-viaje-celda */
-  font-weight: 500;
-}
-
-.fecha-celda {
-  display: block;
-  margin-top: 0.25rem;
-  color: #777;
-}
-
-.sin-resultados {
-  text-align: center;
-  padding: 2.5rem;
-  color: #666;
-}
+.ruta-celda { color: #1e40af; font-weight: 500; }
+.sin-datos { color: #94a3b8; font-style: italic; }
+.estado-ruta-celda { display: flex; align-items: center; gap: 0.3rem; }
+.fecha-celda { display: block; margin-top: 0.25rem; color: #64748b; }
 
 .btn-cambiar {
-  background: #e3f2fd;
-  color: #1565c0;
+  padding: 0.4rem 0.8rem;
+  background: #f1f5f9;
   border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
+  border-radius: 5px;
   cursor: pointer;
-  font-weight: 500;
+  font-size: 0.8rem;
+  transition: background 0.2s;
+}
+.btn-cambiar:hover { background: #e2e8f0; }
+
+.sin-resultados {
+  padding: 2rem;
+  text-align: center;
+  color: #64748b;
 }
 
-.btn-cambiar:hover { 
-  background: #bbdefb; 
+.cargando {
+  text-align: center;
+  padding: 3rem;
+  color: #64748b;
 }
 
-/* Modal — SE MANTIENE TODO IGUAL */
+/* Modal */
 .modal-fondo {
   position: fixed;
   inset: 0;
@@ -161,93 +133,49 @@ small {
 
 .modal {
   background: white;
-  padding: 32px;
+  padding: 2rem;
   border-radius: 12px;
   width: 90%;
   max-width: 500px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
 }
 
-.modal h2 { 
-  margin-top: 0; 
-  color: #1976d2; 
-}
+.modal h2 { margin-top: 0; color: #0f172a; }
+.referencia { margin: 1rem 0; color: #475569; }
 
-.referencia { 
-  margin: 12px 0 4px; 
-}
-
-.campo {
-  margin: 20px 0;
-}
-
-.campo label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-}
-
+.campo { margin-bottom: 1rem; }
+.campo label { display: block; margin-bottom: 0.4rem; font-weight: 500; color: #334155; }
 .campo select, .campo textarea {
   width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 1rem;
+  padding: 0.7rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.95rem;
 }
+
+.msg-error { color: #dc2626; background: #fef2f2; padding: 0.75rem; border-radius: 6px; margin: 1rem 0; }
+.msg-exito { color: #16a34a; background: #f0fdf4; padding: 0.75rem; border-radius: 6px; margin: 1rem 0; }
 
 .botones {
   display: flex;
-  gap: 12px;
+  gap: 0.75rem;
   justify-content: flex-end;
-  margin-top: 24px;
+  margin-top: 1.5rem;
 }
 
 .btn-cancelar {
-  padding: 10px 20px;
-  border: 1px solid #ccc;
+  padding: 0.7rem 1.25rem;
+  border: 1px solid #cbd5e1;
   background: white;
   border-radius: 6px;
   cursor: pointer;
 }
-
 .btn-guardar {
-  padding: 10px 20px;
-  background: #1976d2;
-  color: white;
+  padding: 0.7rem 1.25rem;
   border: none;
+  background: #2563eb;
+  color: white;
   border-radius: 6px;
   cursor: pointer;
 }
-
-.btn-guardar:disabled { 
-  background: #90caf9; 
-  cursor: not-allowed; 
-}
-
-.msg-error { 
-  background: #ffebee; 
-  color: #c62828; 
-  padding: 10px; 
-  border-radius: 6px; 
-  margin: 12px 0; 
-}
-
-.msg-exito { 
-  background: #e8f5e9; 
-  color: #2e7d32; 
-  padding: 10px; 
-  border-radius: 6px; 
-  margin: 12px 0; 
-}
-
-/* Responsivo */
-@media (max-width: 968px) {
-  .resumen-semaforo {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  table {
-    display: block;
-    overflow-x: auto;
-  }
-}
+.btn-guardar:disabled { background: #93c5fd; cursor: not-allowed; }
