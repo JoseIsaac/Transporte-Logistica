@@ -4,8 +4,77 @@
   padding: 0 24px 32px;
 }
 
-h1 { color: #1976d2; }
-.cargando { text-align: center; padding: 40px; color: #666; }
+h1 { 
+  color: #1976d2; 
+  margin-bottom: 1.5rem;
+}
+
+/* ✅ Resumen Semáforo */
+.resumen-semaforo {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.tarjeta-resumen {
+  background: white;
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  border-top: 3px solid;
+}
+
+.tarjeta-resumen.verde { border-top-color: #4caf50; }
+.tarjeta-resumen.amarillo { border-top-color: #ffc107; }
+.tarjeta-resumen.rojo { border-top-color: #f44336; }
+.tarjeta-resumen.total { border-top-color: #1976d2; }
+
+.tarjeta-resumen .numero {
+  display: block;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #263238;
+  margin-bottom: 0.25rem;
+}
+
+.tarjeta-resumen .etiqueta {
+  font-size: 0.85rem;
+  color: #607d8b;
+}
+
+/* ✅ Filtros */
+.filtros {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-filtro {
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 6px;
+  background: white;
+  color: #546e7a;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.btn-filtro:hover,
+.btn-filtro.activo {
+  background: #1976d2;
+  color: white;
+}
+
+.cargando { 
+  text-align: center; 
+  padding: 40px; 
+  color: #666; 
+}
 
 .tabla-contenedor {
   background: white;
@@ -25,9 +94,45 @@ th, td {
   border-bottom: 1px solid #eee;
 }
 
-th { background: #f5f5f5; font-weight: 600; }
-tr:hover { background: #f9f9f9; }
-small { color: #777; }
+th { 
+  background: #f5f5f5; 
+  font-weight: 600; 
+}
+
+tr:hover { 
+  background: #f9f9f9; 
+}
+
+small { 
+  color: #777; 
+}
+
+/* ✅ Estilos para nuevas columnas */
+.ruta-celda {
+  color: #2e7d32;
+  font-weight: 500;
+}
+
+.sin-datos {
+  color: #999;
+  font-style: italic;
+}
+
+.estado-ruta-celda { /* ✅ antes era estado-viaje-celda */
+  font-weight: 500;
+}
+
+.fecha-celda {
+  display: block;
+  margin-top: 0.25rem;
+  color: #777;
+}
+
+.sin-resultados {
+  text-align: center;
+  padding: 2.5rem;
+  color: #666;
+}
 
 .btn-cambiar {
   background: #e3f2fd;
@@ -39,9 +144,11 @@ small { color: #777; }
   font-weight: 500;
 }
 
-.btn-cambiar:hover { background: #bbdefb; }
+.btn-cambiar:hover { 
+  background: #bbdefb; 
+}
 
-/* Modal */
+/* Modal — SE MANTIENE TODO IGUAL */
 .modal-fondo {
   position: fixed;
   inset: 0;
@@ -61,8 +168,14 @@ small { color: #777; }
   box-shadow: 0 8px 32px rgba(0,0,0,0.2);
 }
 
-.modal h2 { margin-top: 0; color: #1976d2; }
-.referencia { margin: 12px 0 4px; }
+.modal h2 { 
+  margin-top: 0; 
+  color: #1976d2; 
+}
+
+.referencia { 
+  margin: 12px 0 4px; 
+}
 
 .campo {
   margin: 20px 0;
@@ -106,7 +219,35 @@ small { color: #777; }
   cursor: pointer;
 }
 
-.btn-guardar:disabled { background: #90caf9; cursor: not-allowed; }
+.btn-guardar:disabled { 
+  background: #90caf9; 
+  cursor: not-allowed; 
+}
 
-.msg-error { background: #ffebee; color: #c62828; padding: 10px; border-radius: 6px; margin: 12px 0; }
-.msg-exito { background: #e8f5e9; color: #2e7d32; padding: 10px; border-radius: 6px; margin: 12px 0; }
+.msg-error { 
+  background: #ffebee; 
+  color: #c62828; 
+  padding: 10px; 
+  border-radius: 6px; 
+  margin: 12px 0; 
+}
+
+.msg-exito { 
+  background: #e8f5e9; 
+  color: #2e7d32; 
+  padding: 10px; 
+  border-radius: 6px; 
+  margin: 12px 0; 
+}
+
+/* Responsivo */
+@media (max-width: 968px) {
+  .resumen-semaforo {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  table {
+    display: block;
+    overflow-x: auto;
+  }
+}

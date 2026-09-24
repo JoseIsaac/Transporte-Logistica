@@ -9,19 +9,23 @@ export class UnidadService {
 
   constructor(private http: HttpClient) {}
 
+  // ✅ Datos del panel con origen, destino y estado de viaje
   obtenerPanel(): Observable<UnidadPanelDTO[]> {
     return this.http.get<UnidadPanelDTO[]>(`${this.apiUrl}/panel`);
   }
 
-  obtenerResumen(): Observable<ResumenSemaforo> {
+  // ✅ Resumen del semáforo (conteo superior)
+  obtenerResumenSemaforo(): Observable<ResumenSemaforo> {
     return this.http.get<ResumenSemaforo>(`${this.apiUrl}/resumen`);
   }
 
+  // ✅ Lista completa de unidades
   obtenerTodas(): Observable<Unidad[]> {
     return this.http.get<Unidad[]>(this.apiUrl);
   }
 
+  // ✅ Cambio de estado del semáforo
   cambiarSemaforo(idUnidad: number, dto: CambioSemaforoDTO): Observable<Unidad> {
-    return this.http.put<Unidad>(`http://localhost:8080/api/semaforo/unidad/${idUnidad}`, dto);
+    return this.http.put<Unidad>(`${this.apiUrl}/semaforo/unidad/${idUnidad}`, dto);
   }
 }

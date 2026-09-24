@@ -1,18 +1,20 @@
 export type TipoUnidad = 'CAMIÓN' | 'TANQUE' | 'CAMIÓN_CARGA' | 'OTRO';
 export type EstadoSemaforo = 'VERDE' | 'AMARILLO' | 'ROJO';
+export type EstadoViaje = 'EN_ESPERA' | 'EN_RUTA' | 'EN_DESCARGA' | 'FINALIZADO' | 'RETRASADO';
 
 export interface Unidad {
   idUnidad: number;
   numeroEconomico: string;
-  tipoUnidad: TipoUnidad;
-  marca: string;
-  modelo: string;
-  anio: number;
+  tipoUnidad: string;
   placas: string;
-  operadorAsignado: string;
-  estadoSemaforo: EstadoSemaforo;
+  operadorAsignado?: string;
+  estadoSemaforo?: EstadoSemaforo;
   observacionesSemaforo?: string;
-  activo: boolean;
+  estadoViaje?: EstadoViaje; // ✅ NO EstadoRuta
+  origen?: string;
+  destino?: string;
+  fechaSalida?: string;
+  fechaLlegadaEstimada?: string;
 }
 
 export interface UnidadPanelDTO {
@@ -23,7 +25,7 @@ export interface UnidadPanelDTO {
   operadorAsignado: string;
   estadoSemaforo: EstadoSemaforo;
   observacionesSemaforo?: string;
-  estadoViaje?: string;
+  estadoViaje?: EstadoViaje; // ✅ De vuelta a estadoViaje
   origen?: string;
   destino?: string;
   fechaSalida?: string;

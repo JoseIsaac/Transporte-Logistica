@@ -30,6 +30,7 @@ com\transportes\logistica\entity\Rol.class
 com\transportes\logistica\dto\CambioEstadoViajeDTO.class
 com\transportes\logistica\enums\TipoMantenimiento.class
 com\transportes\logistica\repository\UnidadRepository.class
+com\transportes\logistica\controller\PanelController.class
 com\transportes\logistica\controller\UnidadController.class
 com\transportes\logistica\controller\ViajeController.class
 com\transportes\logistica\dto\ViajeDTO.class
