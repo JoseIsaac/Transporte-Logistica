@@ -40,7 +40,7 @@ public class ViajeService {
 
         // 1. Buscar unidad
         Unidad unidad = unidadRepository.findById(dto.getIdUnidad())
-            .orElseThrow(() -> new RuntimeException("Unidad no encontrada"));
+                .orElseThrow(() -> new RuntimeException("Unidad no encontrada"));
 
         // 2. 🚦 REGLA: No asignar viaje si la unidad está en ROJO
         if (unidad.getEstadoSemaforo() == EstadoSemaforo.ROJO) {
@@ -55,7 +55,7 @@ public class ViajeService {
 
         // 4. Buscar usuario que registra
         Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         // 5. Crear el viaje
         Viaje viaje = new Viaje();
@@ -75,18 +75,17 @@ public class ViajeService {
 
     // CAMBIAR ESTADO DEL VIAJE
     @Transactional
-    public Viaje cambiarEstado(Long idViaje, CambioEstadoViajeDTO dto) {
-
-        Viaje viaje = viajeRepository.findById(idViaje)
-            .orElseThrow(() -> new RuntimeException("Viaje no encontrado"));
+    public Viaje cambiarEstado(Long id, CambioEstadoViajeDTO dto) {
+        Viaje viaje = repositorio.findById(id)
+                .orElseThrow(() -> new RuntimeException("Viaje no encontrado"));
 
         Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         EstadoViaje estadoAnterior = viaje.getEstadoViaje();
 
         // Actualizar estado
-        viaje.setEstadoViaje(dto.getNuevoEstado());
+        viaje.setEstadoViaje(dto.getNuevoEstado()); // ✅ Campo correcto
 
         // Si se marca como FINALIZADO, registrar llegada real
         if (dto.getNuevoEstado() == EstadoViaje.FINALIZADO) {
@@ -112,14 +111,14 @@ public class ViajeService {
     // OBTENER HISTORIAL POR UNIDAD
     public List<Viaje> obtenerHistorialPorUnidad(Integer idUnidad) {
         Unidad unidad = unidadRepository.findById(idUnidad)
-            .orElseThrow(() -> new RuntimeException("Unidad no encontrada"));
+                .orElseThrow(() -> new RuntimeException("Unidad no encontrada"));
         return viajeRepository.findByUnidadAndActivoTrue(unidad);
     }
 
     // OBTENER VIAJE POR ID
     public Viaje obtenerPorId(Long id) {
         return viajeRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Viaje no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Viaje no encontrado"));
     }
 
     // ELIMINACIÓN LÓGICA

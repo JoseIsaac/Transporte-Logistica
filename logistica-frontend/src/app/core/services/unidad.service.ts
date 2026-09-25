@@ -1,27 +1,31 @@
-// unidad.service.ts → TAL CUAL LO TIENES ✅
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Unidad, UnidadPanelDTO, ResumenSemaforo, CambioSemaforoDTO } from '../models/unidad.model';
+import { UnidadPanelDTO, ResumenSemaforo, CambioSemaforoDTO } from '../models/unidad.model';
 import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class UnidadService {
   private readonly apiUrl = 'http://localhost:8080/api/unidades';
+
   constructor(private http: HttpClient) {}
 
+  // ✅ Para el panel
   obtenerPanel(): Observable<UnidadPanelDTO[]> {
     return this.http.get<UnidadPanelDTO[]>(`${this.apiUrl}/panel`);
   }
 
+  // ✅ Para unidades.component.ts
+  obtenerTodas(): Observable<UnidadPanelDTO[]> {
+    return this.obtenerPanel();
+  }
+
+  // ✅ Resumen
   obtenerResumenSemaforo(): Observable<ResumenSemaforo> {
     return this.http.get<ResumenSemaforo>(`${this.apiUrl}/resumen`);
   }
 
-  obtenerTodas(): Observable<Unidad[]> {
-    return this.http.get<Unidad[]>(this.apiUrl);
-  }
-
-  cambiarSemaforo(idUnidad: number, dto: CambioSemaforoDTO): Observable<Unidad> {
-    return this.http.put<Unidad>(`${this.apiUrl}/semaforo/unidad/${idUnidad}`, dto);
+  // ✅ Cambiar semáforo
+  cambiarSemaforo(id: number, datos: CambioSemaforoDTO): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${id}/semaforo`, datos);
   }
 }

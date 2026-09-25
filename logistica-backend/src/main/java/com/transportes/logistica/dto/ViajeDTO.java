@@ -4,6 +4,7 @@ import com.transportes.logistica.enums.EstadoViaje;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
 import java.time.LocalDateTime;
 
 @Data
@@ -16,10 +17,12 @@ public class ViajeDTO {
 
     @NotBlank(message = "El origen es obligatorio")
     private String origen;
+
     private String direccionOrigen;
 
     @NotBlank(message = "El destino es obligatorio")
     private String destino;
+
     private String direccionDestino;
 
     @NotNull(message = "La fecha de salida es obligatoria")
@@ -27,6 +30,7 @@ public class ViajeDTO {
 
     private LocalDateTime fechaLlegadaEstimada;
     private LocalDateTime fechaLlegadaReal;
+
     private EstadoViaje estadoViaje;
     private String observaciones;
 

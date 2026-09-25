@@ -3,38 +3,48 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ViajeService } from '../../core/services/viaje.service';
 import { UnidadService } from '../../core/services/unidad.service';
-import { AuthService } from '../../core/services/auth.service';
-import { Viaje, ViajeDTO, CambioEstadoViajeDTO, EstadoViaje } from '../../core/models/viaje.model';
-import { Unidad } from '../../core/models/unidad.model';
+import { ViajeDTO, EstadoViaje } from '../../core/models/viaje.model';
+
+interface UnidadSelect {
+  idUnidad: number;
+  numeroEconomico: string;
+  placas: string;
+}
 
 @Component({
   selector: 'app-viajes',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './viajes.component.html',
-  styleUrl: './viajes.component.css'
+  styleUrls: ['./viajes.component.css']
 })
 export class ViajesComponent implements OnInit {
-  viajesActivos: Viaje[] = [];
-  unidades: Unidad[] = [];
+  viajes: ViajeDTO[] = [];
+  unidades: UnidadSelect[] = [];
   cargando = true;
-  formCrear!: FormGroup;
-  formEstado!: FormGroup;
+
   mostrarModalCrear = false;
   mostrarModalEstado = false;
-  viajeSeleccionado: Viaje | null = null;
+  viajeSeleccionado: ViajeDTO | null = null;
   error = '';
   exito = '';
+
+  formCrear: FormGroup;
+  formEstado: FormGroup;
+
+  estados = [
+    { valor: 'EN_ESPERA' as EstadoViaje, etiqueta: 'En Espera', clase: 'espera' },
+    { valor: 'EN_RUTA' as EstadoViaje, etiqueta: 'En Ruta', clase: 'ruta' },
+    { valor: 'EN_DESCARGA' as EstadoViaje, etiqueta: 'En Descarga', clase: 'descarga' },
+    { valor: 'FINALIZADO' as EstadoViaje, etiqueta: 'Finalizado', clase: 'finalizado' },
+    { valor: 'RETRASADO' as EstadoViaje, etiqueta: 'Retrasado', clase: 'retrasado' }
+  ];
 
   constructor(
     private fb: FormBuilder,
     private viajeService: ViajeService,
-    private unidadService: UnidadService,
-    private authService: AuthService
-  ) {}
-
-  ngOnInit() {
-    this.cargarDatos();
+    private unidadService: UnidadService
+  ) {
     this.formCrear = this.fb.group({
       idUnidad: ['', Validators.required],
       origen: ['', Validators.required],
@@ -45,77 +55,131 @@ export class ViajesComponent implements OnInit {
       fechaLlegadaEstimada: [''],
       observaciones: ['']
     });
+
     this.formEstado = this.fb.group({
-      nuevoEstado: ['', Validators.required],
-      observaciones: ['']
+      estadoViaje: ['', Validators.required]
     });
   }
 
-  cargarDatos() {
+  ngOnInit(): void {
+    this.cargarDatos();
+    this.cargarUnidades();
+  }
+
+  cargarDatos(): void {
     this.cargando = true;
-    this.unidadService.obtenerTodas().subscribe(datos => this.unidades = datos);
-    this.viajeService.obtenerActivos().subscribe({
-      next: datos => { this.viajesActivos = datos; this.cargando = false; },
-      error: () => this.cargando = false
+    this.error = '';
+    this.viajeService.obtenerTodos().subscribe({
+      next: (datos) => {
+        this.viajes = datos;
+        this.cargando = false;
+      },
+      error: () => {
+        this.error = 'Error al cargar viajes';
+        this.cargando = false;
+      }
     });
   }
 
-  abrirModalCrear() {
-    this.formCrear.reset();
-    this.error = ''; this.exito = '';
+  cargarUnidades(): void {
+    this.unidadService.obtenerPanel().subscribe({
+      next: (datos) => {
+        this.unidades = datos.map(dto => ({
+          idUnidad: dto.idUnidad,
+          numeroEconomico: dto.numeroEconomico,
+          placas: dto.placas
+        }));
+      },
+      error: () => {
+        this.error = 'No se pudieron cargar las unidades';
+      }
+    });
+  }
+
+  get viajesActivos(): ViajeDTO[] {
+    return this.viajes;
+  }
+
+  abrirModalCrear(): void {
     this.mostrarModalCrear = true;
+    this.error = '';
+    this.exito = '';
+    this.formCrear.reset();
   }
 
-  abrirModalEstado(viaje: Viaje) {
-    this.viajeSeleccionado = viaje;
-    this.formEstado.reset();
-    this.error = ''; this.exito = '';
-    this.mostrarModalEstado = true;
-  }
-
-  cerrarModales() {
+  cerrarModales(): void {
     this.mostrarModalCrear = false;
     this.mostrarModalEstado = false;
     this.viajeSeleccionado = null;
+    this.formCrear.reset();
+    this.formEstado.reset();
+    this.error = '';
+    this.exito = '';
   }
 
-  crearViaje() {
+  crearViaje(): void {
     if (this.formCrear.invalid) return;
-    const usuario = this.authService.getUsuario();
-    if (!usuario) return;
 
-    this.error = '';
-    const datos = { ...this.formCrear.value, idUsuario: usuario.idUsuario } as ViajeDTO;
+    const valores = this.formCrear.value;
 
-    this.viajeService.crear(datos).subscribe({
+    // ✅ Convertir y formatear datos correctamente
+    const viaje: ViajeDTO = {
+      idUnidad: Number(valores.idUnidad), // ← Texto → Número
+      origen: valores.origen,
+      destino: valores.destino,
+      direccionOrigen: valores.direccionOrigen,
+      direccionDestino: valores.direccionDestino,
+      fechaSalida: valores.fechaSalida ? new Date(valores.fechaSalida).toISOString() : '',
+      fechaLlegadaEstimada: valores.fechaLlegadaEstimada ? new Date(valores.fechaLlegadaEstimada).toISOString() : undefined,
+      estadoViaje: 'EN_ESPERA',
+      observaciones: valores.observaciones,
+      idUsuario: 1 // ← Reemplaza con el ID real del usuario autenticado
+    };
+
+    console.log('Enviando viaje:', viaje); // Para depurar
+
+    this.viajeService.crear(viaje).subscribe({
       next: () => {
         this.exito = 'Viaje creado correctamente';
+        this.cerrarModales();
         this.cargarDatos();
-        setTimeout(() => this.cerrarModales(), 1200);
       },
-      error: err => this.error = err.error?.message || 'No se pudo crear el viaje'
+      error: (err) => {
+        console.error('Error completo:', err);
+        this.error = 'Error al crear el viaje';
+      }
     });
   }
 
-  cambiarEstado() {
-    if (this.formEstado.invalid || !this.viajeSeleccionado) return;
-    const usuario = this.authService.getUsuario();
-    if (!usuario) return;
-
+  abrirModalEstado(viaje: ViajeDTO): void {
+    this.viajeSeleccionado = viaje;
+    this.mostrarModalEstado = true;
+    this.formEstado.patchValue({ estadoViaje: viaje.estadoViaje });
     this.error = '';
-    const datos = {
-      nuevoEstado: this.formEstado.value.nuevoEstado as EstadoViaje,
-      observaciones: this.formEstado.value.observaciones,
-      idUsuario: usuario.idUsuario
-    } as CambioEstadoViajeDTO;
+    this.exito = '';
+  }
 
-    this.viajeService.cambiarEstado(this.viajeSeleccionado.idViaje, datos).subscribe({
+  cambiarEstado(): void {
+    if (!this.viajeSeleccionado || this.formEstado.invalid) return;
+
+    const nuevoEstado = this.formEstado.get('estadoViaje')?.value;
+    this.viajeService.cambiarEstado(this.viajeSeleccionado.idViaje!, nuevoEstado).subscribe({
       next: () => {
         this.exito = 'Estado actualizado';
+        this.cerrarModales();
         this.cargarDatos();
-        setTimeout(() => this.cerrarModales(), 1200);
       },
-      error: err => this.error = err.error?.message || 'No se pudo actualizar'
+      error: () => {
+        this.error = 'Error al cambiar estado';
+      }
     });
+  }
+
+  obtenerClaseEstado(estado: string): string {
+    return this.estados.find(e => e.valor === estado)?.clase || '';
+  }
+
+  obtenerEtiquetaEstado(estado: string): string {
+    return this.estados.find(e => e.valor === estado)?.etiqueta || estado;
   }
 }

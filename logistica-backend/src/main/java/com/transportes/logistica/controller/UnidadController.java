@@ -11,7 +11,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/unidades")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "*") // ✅ Debe estar presente
 public class UnidadController {
 
     @Autowired

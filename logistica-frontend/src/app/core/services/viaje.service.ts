@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Viaje, ViajeDTO, CambioEstadoViajeDTO } from '../models/viaje.model';
+import { ViajeDTO } from '../models/viaje.model';
 import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
@@ -9,19 +9,23 @@ export class ViajeService {
 
   constructor(private http: HttpClient) {}
 
-  crear(dto: ViajeDTO): Observable<Viaje> {
-    return this.http.post<Viaje>(this.apiUrl, dto);
+  obtenerTodos(): Observable<ViajeDTO[]> {
+    return this.http.get<ViajeDTO[]>(this.apiUrl);
   }
 
-  cambiarEstado(idViaje: number, dto: CambioEstadoViajeDTO): Observable<Viaje> {
-    return this.http.put<Viaje>(`${this.apiUrl}/${idViaje}/estado`, dto);
+  crear(viaje: ViajeDTO): Observable<ViajeDTO> {
+    return this.http.post<ViajeDTO>(this.apiUrl, viaje);
   }
 
-  obtenerActivos(): Observable<Viaje[]> {
-    return this.http.get<Viaje[]>(`${this.apiUrl}/activos`);
-  }
-
-  obtenerPorUnidad(idUnidad: number): Observable<Viaje[]> {
-    return this.http.get<Viaje[]>(`${this.apiUrl}/unidad/${idUnidad}`);
-  }
+  cambiarEstado(
+  id: number, 
+  nuevoEstado: string,
+  observaciones?: string
+): Observable<ViajeDTO> {
+  return this.http.patch<ViajeDTO>(`${this.apiUrl}/${id}/estado`, {
+    nuevoEstado,
+    observaciones,
+    idUsuario: 1 // ✅ Reemplaza con el ID real del usuario autenticado
+  });
+}
 }
