@@ -23,6 +23,9 @@ import java.util.Optional;
 public class ViajeService {
 
     @Autowired
+    private ViajeRepository repositorio;
+
+    @Autowired
     private ViajeRepository viajeRepository;
 
     @Autowired
@@ -126,5 +129,13 @@ public class ViajeService {
         Viaje viaje = obtenerPorId(id);
         viaje.setActivo(false);
         viajeRepository.save(viaje);
+    }
+
+    public List<Viaje> obtenerTodos() {
+        return repositorio.findAll();
+    }
+
+    public boolean existePorId(Long id) {
+        return repositorio.existsById(id);
     }
 }

@@ -1,14 +1,17 @@
 import { Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
 
+// ✅ IMPORTANTE: La línea de Usuarios ya la tienes arriba, se mantiene
+import { UsuariosComponent } from './pages/usuarios/usuarios.component';
+
 export const routes: Routes = [
-  // 🔐 Pública
+  // 🔐 RUTA PÚBLICA — Login (sin sesión)
   { 
     path: 'login', 
     loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent) 
   },
 
-  // 📋 Protegidas — requieren sesión
+  // 📋 RUTAS PROTEGIDAS — Requieren iniciar sesión
   { 
     path: 'panel', 
     loadComponent: () => import('./pages/panel/panel.component').then(m => m.PanelComponent),
@@ -39,13 +42,16 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/reportes/reportes.component').then(m => m.ReportesComponent),
     canActivate: [AuthGuard]
   },
+
+  // 👤 RUTA DE USUARIOS — Aquí la agregué, entre reportes y redirección
   { 
     path: 'usuarios', 
     loadComponent: () => import('./pages/usuarios/usuarios.component').then(m => m.UsuariosComponent),
     canActivate: [AuthGuard]
   },
 
-  // 🏠 Redirección base
+  // 🏠 REDIRECCIÓN — Si entras a la raíz, te lleva al panel
   { path: '', redirectTo: '/panel', pathMatch: 'full' },
-  { path: '**', redirectTo: '/panel' }
+
+ 
 ];

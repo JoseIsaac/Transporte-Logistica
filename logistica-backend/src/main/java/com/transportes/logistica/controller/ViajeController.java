@@ -11,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -21,45 +22,41 @@ public class ViajeController {
     @Autowired
     private ViajeService viajeService;
 
-    // ✅ LISTAR TODOS LOS VIAJES (lo que llama tu frontend)
+    // ✅ LISTAR TODOS
     @GetMapping
     public ResponseEntity<List<ViajeDTO>> obtenerTodos() {
-        List<ViajeDTO> lista = viajeService.obtenerTodos()
-                .stream()
-                .map(viaje -> convertirADTO(viaje))
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(lista);
+        List<Viaje> listaViajes = viajeService.obtenerTodos();
+        List<ViajeDTO> listaDTO = listaViajes.stream()
+            .map(this::convertirADTO)
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(listaDTO);
     }
 
     // CREAR NUEVO VIAJE
     @PostMapping
     public ResponseEntity<?> crear(@Valid @RequestBody ViajeDTO dto, BindingResult resultado) {
-        // ✅ Si falla la validación, devolvemos el error claro
         if (resultado.hasErrors()) {
             List<String> errores = resultado.getFieldErrors().stream()
-                    .map(e -> e.getField() + ": " + e.getDefaultMessage())
-                    .collect(Collectors.toList());
+                .map(e -> e.getField() + ": " + e.getDefaultMessage())
+                .collect(Collectors.toList());
             return ResponseEntity.badRequest().body(errores);
         }
         Viaje nuevo = viajeService.crearViaje(dto);
         return ResponseEntity.status(201).body(convertirADTO(nuevo));
     }
 
-    // ✅ CAMBIAR ESTADO — PATCH para coincidir con el frontend
+    // CAMBIAR ESTADO DEL VIAJE
     @PatchMapping("/{id}/estado")
     public ResponseEntity<?> cambiarEstado(
-        @PathVariable Long id,
-        @Valid @RequestBody CambioEstadoViajeDTO dto,
-        BindingResult resultado) {
-    if (resultado.hasErrors()) {
-        List<String> errores = resultado.getFieldErrors().stream()
-                .map(e -> e.getField() + ": " + e.getDefaultMessage())
-                .collect(Collectors.toList());
-        return ResponseEntity.badRequest().body(errores);
+            @PathVariable Long id,
+            @Valid @RequestBody CambioEstadoViajeDTO dto,
+            BindingResult resultado) {
+        if (resultado.hasErrors()) {
+            return ResponseEntity.badRequest().body(resultado.getFieldErrors());
+        }
+        Viaje viajeActualizado = viajeService.cambiarEstado(id, dto);
+        return ResponseEntity.ok(convertirADTO(viajeActualizado));
     }
-    Viaje viajeActualizado = viajeService.cambiarEstado(id, dto);
-    return ResponseEntity.ok(convertirADTO(viajeActualizado));
-}
 
     // VER VIAJES ACTIVOS
     @GetMapping("/activos")
@@ -81,12 +78,15 @@ public class ViajeController {
         return ResponseEntity.ok(lista);
     }
 
-    // DETALLE INDIVIDUAL
+   // DETALLE INDIVIDUAL ✅ Ajustado a tu servicio
     @GetMapping("/{id}")
     public ResponseEntity<ViajeDTO> obtenerDetalle(@PathVariable Long id) {
-        return viajeService.obtenerPorId(id)
-                .map(viaje -> ResponseEntity.ok(convertirADTO(viaje)))
-                .orElse(ResponseEntity.notFound().build());
+        if (!viajeService.existePorId(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        // Tu servicio devuelve Viaje directamente, no Optional
+        Viaje viaje = viajeService.obtenerPorId(id);
+        return ResponseEntity.ok(convertirADTO(viaje));
     }
 
     // CANCELAR/ELIMINAR
@@ -99,12 +99,12 @@ public class ViajeController {
         return ResponseEntity.noContent().build();
     }
 
-    // ✅ Convertir Entidad → DTO para enviar al frontend
+    // ✅ Convertir Entidad → DTO
     private ViajeDTO convertirADTO(Viaje viaje) {
         ViajeDTO dto = new ViajeDTO();
         dto.setIdViaje(viaje.getIdViaje());
         dto.setIdUnidad(viaje.getUnidad().getIdUnidad());
-        dto.setNumeroEconomico(viaje.getUnidad().getNumeroEconomico()); // ✅ Para la tabla
+        dto.setNumeroEconomico(viaje.getUnidad().getNumeroEconomico());
         dto.setOrigen(viaje.getOrigen());
         dto.setDestino(viaje.getDestino());
         dto.setDireccionOrigen(viaje.getDireccionOrigen());

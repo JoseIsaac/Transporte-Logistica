@@ -15,6 +15,9 @@ public class ViajeDTO {
     @NotNull(message = "La unidad es obligatoria")
     private Integer idUnidad;
 
+    @NotNull(message = "El número económico es obligatorio")
+    private String numeroEconomico;
+
     @NotBlank(message = "El origen es obligatorio")
     private String origen;
 

@@ -1,9 +1,241 @@
-<div class="pagina-modulo">
-  <h1>{{ titulo }}</h1>
-  <p class="descripcion">Accesos, roles y configuración del sistema</p>
-  
-  <div class="pendiente-modulo">
-    <p>🚧 Módulo en preparación...</p>
-    <p>Gestión de quién accede y qué puede hacer en el sistema</p>
+<div class="contenedor">
+  <div class="cabecera">
+    <h1>👤 Gestión de Usuarios</h1>
+    <button class="btn-primario" (click)="abrirModalCrear()">+ Nuevo Usuario</button>
   </div>
+
+  <!-- CARGA CON DISEÑO -->
+  @if (cargando) {
+  <div class="carga-contenedor">
+    <div class="spinner"></div>
+    <p class="texto-carga">Cargando usuarios...</p>
+  </div>
+  }
+
+  <!-- TABLA -->
+  @if (!cargando) {
+  <div class="tabla-contenedor">
+    @if (usuarios.length === 0) {
+    <p class="sin-datos">No hay usuarios registrados.</p>
+    } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>Usuario</th>
+          <th>Nombre Completo</th>
+          <th>Rol</th>
+          <th>Correo</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (u of usuarios; track u.idUsuario) {
+        <tr>
+          <td><strong>{{ u.usuario }}</strong></td>
+          <td>{{ u.nombreCompleto }}</td>
+          <td><span class="etiqueta-rol">{{ u.nombreRol }}</span></td>
+          <td>{{ u.correo || '—' }}</td>
+          <td>
+            <span class="estado {{ u.activo ? 'activo' : 'inactivo' }}">
+              {{ u.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+          <td class="acciones">
+            <button class="btn-editar" (click)="abrirModalEditar(u)">Editar</button>
+            <button class="btn-clave" (click)="abrirModalContrasena(u)">Clave</button>
+            <button class="btn-estado" (click)="toggleEstado(u)">
+              {{ u.activo ? 'Desactivar' : 'Activar' }}
+            </button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+    }
+  </div>
+  }
+
+  <!-- Mensajes -->
+  @if (error) { <div class="msg-error global">{{ error }}</div> }
+  @if (exito) { <div class="msg-exito global">{{ exito }}</div> }
+
+  <!-- MODAL NUEVO USUARIO -->
+  @if (mostrarModalCrear) {
+  <div class="modal-fondo" (click)="cerrarModales()">
+    <div class="modal-contenido" (click)="$event.stopPropagation()">
+      <div class="modal-cabecera">
+        <h3>➕ Nuevo Usuario</h3>
+        <button class="modal-cerrar" (click)="cerrarModales()">✕</button>
+      </div>
+      <form [formGroup]="formCrear" (ngSubmit)="crearUsuario()" class="modal-cuerpo">
+        <div class="form-grupo">
+          <label>Rol *</label>
+          <select formControlName="idRol" class="form-control">
+            <option value="">Selecciona un rol</option>
+            @for (rol of roles; track rol.idRol) {
+            <option [value]="rol.idRol">{{ rol.nombre }}</option>
+            }
+          </select>
+          @if (formCrear.get('idRol')?.touched && formCrear.get('idRol')?.invalid) {
+          <span class="mensaje-error">El rol es obligatorio</span>
+          }
+        </div>
+
+        <div class="form-grupo">
+          <label>Nombre Completo *</label>
+          <input type="text" formControlName="nombreCompleto" class="form-control" placeholder="Nombre y apellidos">
+          @if (formCrear.get('nombreCompleto')?.touched && formCrear.get('nombreCompleto')?.invalid) {
+          <span class="mensaje-error">El nombre es obligatorio</span>
+          }
+        </div>
+
+        <div class="form-grupo">
+          <label>Usuario *</label>
+          <input type="text" formControlName="usuario" class="form-control" placeholder="Nombre de usuario">
+          @if (formCrear.get('usuario')?.touched && formCrear.get('usuario')?.invalid) {
+          <span class="mensaje-error">Mínimo 3 caracteres</span>
+          }
+        </div>
+
+        <div class="form-grupo">
+          <label>Correo</label>
+          <input type="email" formControlName="correo" class="form-control" placeholder="correo@ejemplo.com">
+        </div>
+
+        <div class="form-grupo">
+          <label>Contraseña *</label>
+          <input type="password" formControlName="contrasena" class="form-control" placeholder="Mínimo 4 caracteres">
+          @if (formCrear.get('contrasena')?.touched && formCrear.get('contrasena')?.invalid) {
+          <span class="mensaje-error">Mínimo 4 caracteres</span>
+          }
+        </div>
+
+        <div class="form-grupo-checkbox">
+          <input type="checkbox" formControlName="activo" id="activo-crear">
+          <label for="activo-crear">Usuario activo</label>
+        </div>
+
+        <div class="modal-pie">
+          <button type="button" class="btn-cancelar" (click)="cerrarModales()">Cancelar</button>
+          <button type="submit" class="btn-guardar" [disabled]="formCrear.invalid">Guardar Usuario</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  }
+
+  <!-- MODAL EDITAR USUARIO -->
+  @if (mostrarModalEditar && usuarioSeleccionado) {
+  <div class="modal-fondo" (click)="cerrarModales()">
+    <div class="modal-contenido" (click)="$event.stopPropagation()">
+      <div class="modal-cabecera">
+        <h3>✏️ Editar Usuario</h3>
+        <button class="modal-cerrar" (click)="cerrarModales()">✕</button>
+      </div>
+      <form [formGroup]="formEditar" (ngSubmit)="editarUsuario()" class="modal-cuerpo">
+        <div class="form-grupo">
+          <label>Rol *</label>
+          <select formControlName="idRol" class="form-control">
+            <option value="">Selecciona un rol</option>
+            @for (rol of roles; track rol.idRol) {
+            <option [value]="rol.idRol">{{ rol.nombre }}</option>
+            }
+          </select>
+          @if (formEditar.get('idRol')?.touched && formEditar.get('idRol')?.invalid) {
+          <span class="mensaje-error">El rol es obligatorio</span>
+          }
+        </div>
+
+        <div class="form-grupo">
+          <label>Nombre Completo *</label>
+          <input type="text" formControlName="nombreCompleto" class="form-control">
+          @if (formEditar.get('nombreCompleto')?.touched && formEditar.get('nombreCompleto')?.invalid) {
+          <span class="mensaje-error">El nombre es obligatorio</span>
+          }
+        </div>
+
+        <div class="form-grupo">
+          <label>Usuario *</label>
+          <input type="text" formControlName="usuario" class="form-control">
+          @if (formEditar.get('usuario')?.touched && formEditar.get('usuario')?.invalid) {
+          <span class="mensaje-error">Mínimo 3 caracteres</span>
+          }
+        </div>
+
+        <div class="form-grupo">
+          <label>Correo</label>
+          <input type="email" formControlName="correo" class="form-control">
+        </div>
+
+        <div class="form-grupo-checkbox">
+          <input type="checkbox" formControlName="activo" id="activo-editar">
+          <label for="activo-editar">Usuario activo</label>
+        </div>
+
+        <div class="modal-pie">
+          <button type="button" class="btn-cancelar" (click)="cerrarModales()">Cancelar</button>
+          <button type="submit" class="btn-guardar" [disabled]="formEditar.invalid">Actualizar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  }
+
+  <!-- MODAL CAMBIAR CONTRASEÑA -->
+  @if (mostrarModalContrasena && usuarioSeleccionado) {
+  <div class="modal-fondo" (click)="cerrarModales()">
+    <div class="modal-contenido" (click)="$event.stopPropagation()">
+      <div class="modal-cabecera">
+        <h3>🔑 Cambiar Contraseña</h3>
+        <button class="modal-cerrar" (click)="cerrarModales()">✕</button>
+      </div>
+      <form [formGroup]="formContrasena" (ngSubmit)="cambiarContrasena()" class="modal-cuerpo">
+
+        <div class="form-grupo">
+          <label>Contraseña Actual *</label>
+          <input type="password" formControlName="contrasenaActual" class="form-control"
+            placeholder="Escribe tu contraseña actual">
+          @if (formContrasena.get('contrasenaActual')?.touched && formContrasena.get('contrasenaActual')?.invalid) {
+          <span class="mensaje-error">Escribe tu contraseña actual</span>
+          }
+        </div>
+
+        <div class="form-grupo">
+          <label>Nueva Contraseña *</label>
+          <input type="password" formControlName="nuevaContrasena" class="form-control"
+            placeholder="Mínimo 4 caracteres">
+          @if (formContrasena.get('nuevaContrasena')?.touched && formContrasena.get('nuevaContrasena')?.invalid) {
+          <span class="mensaje-error">Mínimo 4 caracteres</span>
+          }
+        </div>
+
+        <div class="form-grupo">
+          <label>Confirmar Contraseña *</label>
+          <input type="password" formControlName="confirmarContrasena" class="form-control"
+            placeholder="Repite la nueva contraseña">
+          @if (formContrasena.get('confirmarContrasena')?.touched && formContrasena.get('confirmarContrasena')?.invalid)
+          {
+          <span class="mensaje-error">Confirma la contraseña</span>
+          }
+        </div>
+
+        <!-- ✅ MENSAJES QUE FALTABAN AQUÍ -->
+        @if (error) {
+        <div class="msg-error-fijo">{{ error }}</div>
+        }
+        @if (exito) {
+        <div class="msg-exito-fijo">{{ exito }}</div>
+        }
+
+        <div class="modal-pie">
+          <button type="button" class="btn-cancelar" (click)="cerrarModales()">Cancelar</button>
+          <button type="submit" class="btn-guardar" [disabled]="formContrasena.invalid">
+            Cambiar Contraseña
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  }
 </div>
