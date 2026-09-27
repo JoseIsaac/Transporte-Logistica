@@ -6,8 +6,8 @@ export interface Unidad {
   idUnidad: number;
   numeroEconomico: string;
   tipoUnidad: TipoUnidad | string;
-  marca?: string;
-  modelo?: string;
+  marca?: string;        // ✅ con ? = puede ser undefined
+  modelo?: string;       // ✅ con ? = puede ser undefined
   anio?: number;
   placas: string;
   numeroSerie?: string;
@@ -27,6 +27,8 @@ export interface UnidadPanelDTO {
   idUnidad: number;
   numeroEconomico: string;
   tipoUnidad: TipoUnidad | string;
+  marca?: string;                    // ✅ Agregado
+  modelo?: string;                   // ✅ Agregado
   placas: string;
   operadorAsignado?: string;
   estadoSemaforo?: EstadoSemaforo;

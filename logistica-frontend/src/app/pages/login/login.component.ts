@@ -15,7 +15,7 @@ export class LoginComponent {
   formLogin: FormGroup;
   cargando = false;
   error = '';
-
+  
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -28,19 +28,19 @@ export class LoginComponent {
   }
 
   enviar() {
-    if (this.formLogin.invalid) return;
-
-    this.cargando = true;
-    this.error = '';
-
-    this.authService.login(this.formLogin.value).subscribe({
-      next: () => {
-        this.router.navigate(['/panel']);
-      },
-      error: () => {
-        this.error = 'Usuario o contraseña incorrectos';
-        this.cargando = false;
-      }
-    });
-  }
+  if (this.formLogin.invalid) return;
+  this.cargando = true;
+  this.error = '';
+  
+  this.authService.login(this.formLogin.value).subscribe({
+    next: (respuesta) => {
+      console.log('✅ Login respuesta:', respuesta); // 👈 Agrega esta línea
+      this.router.navigate(['/panel']);
+    },
+    error: () => {
+      this.error = 'Usuario o contraseña incorrectos';
+      this.cargando = false;
+    }
+  });
+}
 }

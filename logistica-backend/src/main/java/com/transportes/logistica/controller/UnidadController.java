@@ -1,8 +1,10 @@
 package com.transportes.logistica.controller;
 
 import com.transportes.logistica.dto.UnidadPanelDTO;
+import com.transportes.logistica.entity.Unidad;
+import com.transportes.logistica.enums.EstadoSemaforo;
 import com.transportes.logistica.service.UnidadService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,23 +13,49 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/unidades")
-@CrossOrigin(origins = "*") // ✅ Debe estar presente
+@CrossOrigin(origins = "*")
+@RequiredArgsConstructor
 public class UnidadController {
 
-    @Autowired
-    private UnidadService unidadService;
+    private final UnidadService unidadService;
 
-    // ✅ Datos para el panel — usa el servicio ya existente
     @GetMapping("/panel")
-    public ResponseEntity<List<UnidadPanelDTO>> obtenerParaPanel() {
-        List<UnidadPanelDTO> lista = unidadService.obtenerPanelUnidades();
-        return ResponseEntity.ok(lista);
+    public ResponseEntity<List<UnidadPanelDTO>> obtenerPanel() {
+        return ResponseEntity.ok(unidadService.obtenerPanelUnidades());
     }
 
-    // ✅ Resumen de semáforo para las tarjetas
     @GetMapping("/resumen")
     public ResponseEntity<Map<String, Long>> obtenerResumen() {
-        Map<String, Long> resumen = unidadService.obtenerResumenSemaforo();
-        return ResponseEntity.ok(resumen);
+        return ResponseEntity.ok(unidadService.obtenerResumenSemaforo());
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Unidad>> listarTodas() {
+        return ResponseEntity.ok(unidadService.obtenerTodasActivas());
+    }
+
+    // ✅ Editar — Solo campos permitidos
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> actualizar(@PathVariable Integer id, @RequestBody Map<String, Object> campos) {
+        Unidad unidad = unidadService.buscarPorId(id);
+        if (unidad == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (campos.containsKey("placas")) {
+            unidad.setPlacas((String) campos.get("placas"));
+        }
+        if (campos.containsKey("operadorAsignado")) {
+            unidad.setOperadorAsignado((String) campos.get("operadorAsignado"));
+        }
+        if (campos.containsKey("estadoSemaforo")) {
+            unidad.setEstadoSemaforo(EstadoSemaforo.valueOf((String) campos.get("estadoSemaforo")));
+        }
+        if (campos.containsKey("observacionesSemaforo")) {
+            unidad.setObservacionesSemaforo((String) campos.get("observacionesSemaforo"));
+        }
+
+        unidadService.guardar(unidad);
+        return ResponseEntity.ok(Map.of("mensaje", "Unidad actualizada correctamente"));
     }
 }

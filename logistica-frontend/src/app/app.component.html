@@ -1,39 +1,49 @@
-<!-- Barra superior FIJA -->
-<header class="barra-superior">
-  <div class="izquierda">
+<div class="contenedor-principal">
+  <!-- 🔝 Barra Superior -->
+  <header class="barra-superior">
     <h1 class="titulo-sistema">🚚 Sistema de Logística de Transportes</h1>
-  </div>
-  <div class="derecha">
-    <span class="usuario-actual">Administrador</span>
-  </div>
-</header>
+    
+    <div class="seccion-usuario">
+      <!-- ✅ Nombre en VERDE arriba del rol -->
+      <div class="info-usuario">
+        <span class="nombre-usuario">{{ nombreCompleto }}</span>
+        <span class="rol-usuario">{{ rolUsuario }}</span>
+      </div>
+      
+      <!-- ✅ Botón Cerrar Sesión -->
+      <button class="btn-cerrar" (click)="cerrarSesion()">
+        ⚡ Cerrar
+      </button>
+    </div>
+  </header>
 
-<!-- Menú de navegación FIJO -->
-<nav class="menu-principal">
-  <a routerLink="/panel" routerLinkActive="activo" class="enlace-modulo">
-    📊 Panel de Control
-  </a>
-  <a routerLink="/unidades" routerLinkActive="activo" class="enlace-modulo">
-    🚛 Unidades / Flota
-  </a>
-  <a routerLink="/rutas" routerLinkActive="activo" class="enlace-modulo">
-    🛣️ Rutas
-  </a>
-  <a routerLink="/viajes" routerLinkActive="activo" class="enlace-modulo">
-    🚚 Viajes
-  </a>
-  <a routerLink="/operadores" routerLinkActive="activo" class="enlace-modulo">
-    👷 Operadores
-  </a>
-  <a routerLink="/reportes" routerLinkActive="activo" class="enlace-modulo">
-    📈 Reportes
-  </a>
-  <a routerLink="/usuarios" routerLinkActive="activo" class="enlace-modulo">
-    👤 Usuarios
-  </a>
-</nav>
+  <!-- 🧭 Navegación -->
+  <nav class="navegacion">
+    <a routerLink="/panel" routerLinkActive="activo" class="enlace-navegacion">
+      📊 Panel de Control
+    </a>
+    <a routerLink="/unidades" routerLinkActive="activo" class="enlace-navegacion">
+      🚛 Unidades / Flota
+    </a>
+    <a routerLink="/rutas" routerLinkActive="activo" class="enlace-navegacion">
+      🗺️ Rutas
+    </a>
+    <a routerLink="/viajes" routerLinkActive="activo" class="enlace-navegacion">
+      🚚 Viajes
+    </a>
+    <a routerLink="/operadores" routerLinkActive="activo" class="enlace-navegacion">
+      👷 Operadores
+    </a>
+    <a routerLink="/reportes" routerLinkActive="activo" class="enlace-navegacion">
+      📈 Reportes
+    </a>
+    <a routerLink="/usuarios" routerLinkActive="activo" class="enlace-navegacion">
+      👤 Usuarios
+    </a>
+  </nav>
 
-<!-- Contenido que se desplaza -->
-<main class="contenido-pagina">
-  <router-outlet />
-</main>
+  <!-- 📄 Contenido de cada página -->
+  <main class="contenido-pagina">
+    <router-outlet />
+  </main>
+</div>

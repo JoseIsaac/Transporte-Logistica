@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 export class UnidadService {
   private readonly apiUrl = 'http://localhost:8080/api/unidades';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // ✅ Para el panel
   obtenerPanel(): Observable<UnidadPanelDTO[]> {
@@ -28,4 +28,20 @@ export class UnidadService {
   cambiarSemaforo(id: number, datos: CambioSemaforoDTO): Observable<any> {
     return this.http.patch(`${this.apiUrl}/${id}/semaforo`, datos);
   }
+  // ✅ NUEVO — Crear unidad
+  crearUnidad(datos: any): Observable<any> {
+    return this.http.post(this.apiUrl, datos);
+  }
+
+  // ✅ Actualizar unidad (solo campos permitidos)
+  actualizarUnidad(datos: {
+    idUnidad: number;
+    placas: string;
+    operadorAsignado?: string;
+    estadoSemaforo: string;
+    observacionesSemaforo?: string;
+  }): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${datos.idUnidad}`, datos);
+  }
 }
+

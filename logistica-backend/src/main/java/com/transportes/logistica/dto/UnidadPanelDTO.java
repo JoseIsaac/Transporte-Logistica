@@ -11,6 +11,8 @@ public class UnidadPanelDTO {
     private Integer idUnidad;
     private String numeroEconomico;
     private String tipoUnidad;
+    private String marca;           // ✅ NUEVO
+    private String modelo;          // ✅ NUEVO
     private String placas;
     private String operadorAsignado;
     private String estadoSemaforo;

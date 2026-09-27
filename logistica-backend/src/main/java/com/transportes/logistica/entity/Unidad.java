@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @AllArgsConstructor
 @Entity
 @Table(name = "unidades")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // ✅ Agrega esto
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" }) // ✅ Agrega esto
 public class Unidad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,20 +39,20 @@ public class Unidad {
     @Column(nullable = false)
     private Integer anio;
 
-    @Column(nullable = false, unique = true, length = 20)
+    @Column(nullable = false, length = 15)
     private String placas;
 
     @Column(name = "numero_serie", unique = true, length = 50)
     private String numeroSerie;
 
-    @Column(name = "operador_asignado", length = 100)
+    @Column(length = 100)
     private String operadorAsignado;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "estado_semaforo")
-    private EstadoSemaforo estadoSemaforo = EstadoSemaforo.VERDE;
+    @Column(nullable = false)
+    private EstadoSemaforo estadoSemaforo;
 
-    @Column(name = "observaciones_semaforo", columnDefinition = "TEXT")
+    @Column(length = 255)
     private String observacionesSemaforo;
 
     @Column(length = 100)

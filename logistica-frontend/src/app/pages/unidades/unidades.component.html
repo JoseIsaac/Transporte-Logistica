@@ -21,7 +21,7 @@
     </div>
   </div>
 
-  <!-- Filtros -->
+  <!-- Filtros + Botón Nueva Unidad A LA DERECHA -->
   <div class="filtros">
     <button class="btn-filtro" [class.activo]="filtro === 'todas'" (click)="filtrar('todas')">Todas</button>
     <button class="btn-filtro" [class.activo]="filtro === 'VERDE'" (click)="filtrar('VERDE')">🟢 Operación</button>
@@ -31,11 +31,17 @@
     <button class="btn-filtro" [class.activo]="filtro === 'EN_RUTA'" (click)="filtrar('EN_RUTA')">🚛 En Ruta</button>
     <button class="btn-filtro" [class.activo]="filtro === 'EN_ESPERA'" (click)="filtrar('EN_ESPERA')">⏳ En
       Espera</button>
+
+    <!-- ✅ Botón Nueva Unidad — Alineado a la derecha -->
+    <button class="btn-nueva-unidad" (click)="abrirModalCrear()">+ Nueva Unidad</button>
   </div>
 
   <!-- Tabla -->
   @if (cargando) {
-  <div class="cargando">Cargando unidades...</div>
+  <div class="carga-contenedor">
+    <div class="spinner"></div>
+    <p class="texto-carga">Cargando unidades...</p>
+  </div>
   } @else {
   <div class="tabla-contenedor">
     <table>
@@ -58,14 +64,7 @@
             <strong>{{ u.numeroEconomico }}</strong><br>
             <small>{{ u.tipoUnidad?.replace('_', ' ') }}</small>
           </td>
-          <td>
-            @if ('marca' in u) {
-            {{ u.marca }} {{ u.modelo || '' }}
-            @if (u.anio) { <br><small>{{ u.anio }}</small> }
-            } @else {
-            —
-            }
-          </td>
+          <td>{{ u.marca || '—' }} / {{ u.modelo || '—' }}</td>
           <td>{{ u.placas }}</td>
           <td>{{ u.operadorAsignado || 'Sin asignar' }}</td>
           <td>
@@ -85,14 +84,16 @@
             }
           </td>
           <td><app-semaforo-badge [estado]="u.estadoSemaforo" /></td>
-          <td>
+          <td class="acciones">
+            @if (esAdministrador) {
+            <button class="btn-editar" (click)="abrirModalEditar(u)">Editar</button>
+            }
             <button class="btn-cambiar" (click)="abrirModal(u)">Cambiar Semáforo</button>
           </td>
         </tr>
         }
       </tbody>
     </table>
-
     @if (unidadesFiltradas.length === 0) {
     <div class="sin-resultados">
       No hay unidades que coincidan con el filtro seleccionado.
@@ -110,10 +111,9 @@
         Unidad: <strong>{{ unidadSeleccionada.numeroEconomico }}</strong> — Estado actual:
       </p>
       <app-semaforo-badge [estado]="unidadSeleccionada.estadoSemaforo ?? 'VERDE'" />
-
       <form [formGroup]="formCambio" (ngSubmit)="guardarCambio()">
         <div class="campo">
-          <label>Nuevo Estado</label>
+          <label>Nuevo Estado *</label>
           <select formControlName="nuevoEstado">
             <option value="">Seleccionar...</option>
             <option value="VERDE">🟢 VERDE — En servicio</option>
@@ -121,21 +121,182 @@
             <option value="ROJO">🔴 ROJO — Fuera de servicio</option>
           </select>
         </div>
-
         <div class="campo">
-          <label>Motivo del Cambio</label>
-          <textarea formControlName="motivo" rows="3" placeholder="Escribe el motivo..."></textarea>
+          <label>Motivo del Cambio
+            @if (formCambio.get('nuevoEstado')?.value && formCambio.get('nuevoEstado')?.value !== 'VERDE') { * }
+          </label>
+          <textarea formControlName="motivo" rows="3"></textarea>
+          @if (formCambio.get('nuevoEstado')?.value && formCambio.get('nuevoEstado')?.value !== 'VERDE') {
+          <span class="mensaje-ayuda">Escribe el motivo del cambio...</span>
+          } @else {
+          <span class="mensaje-ayuda opcional">(Opcional)</span>
+          }
+          @if (formCambio.get('motivo')?.touched && formCambio.get('motivo')?.invalid) {
+          <span class="mensaje-error">⚠️ El motivo es obligatorio para este estado</span>
+          }
         </div>
-
+        <!-- Mensajes -->
         @if (error) { <div class="msg-error">{{ error }}</div> }
         @if (exito) { <div class="msg-exito">{{ exito }}</div> }
-
         <div class="botones">
           <button type="button" class="btn-cancelar" (click)="cerrarModal()">Cancelar</button>
-          <button type="submit" class="btn-guardar" [disabled]="formCambio.invalid">Guardar Cambios</button>
+          <button type="submit" class="btn-guardar" [disabled]="formCambio.invalid">
+            Guardar Cambios
+          </button>
         </div>
       </form>
     </div>
   </div>
   }
+
+  <!-- Modal Crear Unidad -->
+  @if (mostrarModalCrear) {
+  <div class="modal-fondo" (click.self)="cerrarModalCrear()">
+    <div class="modal-contenido">
+      <div class="modal-cabecera">
+        <h3>🚛 Registrar Nueva Unidad</h3>
+        <button class="modal-cerrar" (click)="cerrarModalCrear()">&times;</button>
+      </div>
+      <div class="modal-cuerpo">
+        @if (exito) { <div class="msg-exito-fijo">{{ exito }}</div> }
+        @if (error) { <div class="msg-error-fijo">{{ error }}</div> }
+
+        <form [formGroup]="formCrear" (ngSubmit)="guardarNuevaUnidad()">
+          <div class="fila">
+            <div class="form-grupo">
+              <label>Número Económico *</label>
+              <input type="text" formControlName="numeroEconomico" class="form-control" placeholder="TR-001">
+              @if (formCrear.get('numeroEconomico')?.touched && formCrear.get('numeroEconomico')?.invalid) {
+              <span class="mensaje-error">Requerido (máx. 20 caracteres)</span>
+              }
+            </div>
+            <div class="form-grupo">
+              <label>Tipo de Unidad *</label>
+              <select formControlName="tipoUnidad" class="form-control">
+                <option value="">Selecciona...</option>
+                @for (t of tiposUnidad; track t) {
+                <option [value]="t">{{ t.replace('_', ' ') }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="fila">
+            <div class="form-grupo">
+              <label>Marca *</label>
+              <input type="text" formControlName="marca" class="form-control" placeholder="Kenworth">
+            </div>
+            <div class="form-grupo">
+              <label>Modelo *</label>
+              <input type="text" formControlName="modelo" class="form-control" placeholder="T680">
+            </div>
+            <div class="form-grupo">
+              <label>Año *</label>
+              <input type="number" formControlName="anio" class="form-control" placeholder="2024">
+            </div>
+          </div>
+
+          <div class="fila">
+            <div class="form-grupo">
+              <label>Placas *</label>
+              <input type="text" formControlName="placas" class="form-control" placeholder="MEX-123-AB">
+            </div>
+            <div class="form-grupo">
+              <label>Operador Asignado</label>
+              <input type="text" formControlName="operadorAsignado" class="form-control"
+                placeholder="Nombre del conductor">
+            </div>
+          </div>
+
+          <div class="form-grupo">
+            <label>Estado Semáforo *</label>
+            <select formControlName="estadoSemaforo" class="form-control">
+              @for (e of estadosSemaforo; track e) {
+              <option [value]="e">{{ e }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-grupo">
+            <label>Observaciones</label>
+            <textarea formControlName="observacionesSemaforo" class="form-control" rows="2"
+              placeholder="Opcional"></textarea>
+          </div>
+
+          <div class="modal-pie">
+            <button type="button" class="btn-cancelar" (click)="cerrarModalCrear()">Cancelar</button>
+            <button type="submit" class="btn-guardar" [disabled]="formCrear.invalid">Guardar Unidad</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  }
 </div>
+
+
+<!-- ✅ MODAL EDITAR UNIDAD — Solo campos permitidos -->
+@if (mostrarModalEditar && unidadEditar) {
+  <div class="modal-fondo" (click.self)="cerrarModalEditar()">
+    <div class="modal-contenido">
+      <div class="modal-cabecera">
+        <h3>✏️ Editar Unidad</h3>
+        <button class="modal-cerrar" (click)="cerrarModalEditar()">&times;</button>
+      </div>
+      <div class="modal-cuerpo">
+        @if (exito) { <div class="msg-exito-fijo">{{ exito }}</div> }
+        @if (error) { <div class="msg-error-fijo">{{ error }}</div> }
+
+        <!-- 📋 Datos NO editables — Solo lectura -->
+        <div class="datos-no-editables">
+          <p class="etiqueta-dato"><strong>N° Económico:</strong> {{ unidadEditar.numeroEconomico }}</p>
+          <p class="etiqueta-dato"><strong>Tipo:</strong> {{ unidadEditar.tipoUnidad?.replace('_', ' ') }}</p>
+          <p class="etiqueta-dato"><strong>Marca / Modelo:</strong> {{ unidadEditar.marca || '—' }} / {{ unidadEditar.modelo || '—' }}</p>
+          <p class="aviso-edicion">ℹ️ Solo se permite modificar los campos de abajo</p>
+        </div>
+
+        <form [formGroup]="formEditar" (ngSubmit)="guardarEdicion()">
+          <!-- ✅ Placas → EDITABLE -->
+          <div class="form-grupo">
+            <label>Placas *</label>
+            <input type="text" formControlName="placas" class="form-control" placeholder="MEX-123-AB">
+            @if (formEditar.get('placas')?.touched && formEditar.get('placas')?.invalid) {
+              <span class="mensaje-error">Las placas son obligatorias</span>
+            }
+          </div>
+
+          <!-- ✅ Operador Asignado → EDITABLE -->
+          <div class="form-grupo">
+            <label>Operador Asignado</label>
+            <input type="text" formControlName="operadorAsignado" class="form-control" placeholder="Nombre del conductor">
+          </div>
+
+          <!-- ✅ Estado Semáforo → EDITABLE -->
+          <div class="form-grupo">
+            <label>Estado Semáforo *</label>
+            <select formControlName="estadoSemaforo" class="form-control">
+              <option value="">Selecciona...</option>
+              @for (e of estadosSemaforo; track e) {
+                <option [value]="e">{{ e === 'VERDE' ? '🟢 En Operación' : e === 'AMARILLO' ? '🟡 En Revisión' : '🔴 Fuera de Servicio' }}</option>
+              }
+            </select>
+            @if (formEditar.get('estadoSemaforo')?.touched && formEditar.get('estadoSemaforo')?.invalid) {
+              <span class="mensaje-error">Selecciona un estado</span>
+            }
+          </div>
+
+          <!-- ✅ Observaciones → EDITABLE -->
+          <div class="form-grupo">
+            <label>Observaciones</label>
+            <textarea formControlName="observacionesSemaforo" class="form-control" rows="3" placeholder="Notas o detalles del estado"></textarea>
+          </div>
+
+          <div class="modal-pie">
+            <button type="button" class="btn-cancelar" (click)="cerrarModalEditar()">Cancelar</button>
+            <button type="submit" class="btn-guardar" [disabled]="formEditar.invalid">Guardar Cambios</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}

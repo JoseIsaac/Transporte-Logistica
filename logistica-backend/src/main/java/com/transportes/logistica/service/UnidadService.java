@@ -23,8 +23,7 @@ public class UnidadService {
     private final UnidadRepository unidadRepository;
     private final ViajeRepository viajeRepository;
 
-    private static final DateTimeFormatter FORMATO_FECHA = 
-        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public List<Unidad> obtenerTodasActivas() {
         return unidadRepository.findByActivoTrue();
@@ -38,35 +37,36 @@ public class UnidadService {
             Optional<Viaje> viajeActivo = viajeRepository.findViajeActivoByUnidad(u.getIdUnidad());
 
             EstadoViaje estadoViaje = viajeActivo
-                .map(Viaje::getEstadoViaje)
-                .orElse(u.getEstadoViaje());
+                    .map(Viaje::getEstadoViaje)
+                    .orElse(u.getEstadoViaje());
 
             String origen = viajeActivo.map(Viaje::getOrigen).orElse(u.getOrigen());
             String destino = viajeActivo.map(Viaje::getDestino).orElse(u.getDestino());
 
             // ✅ Formateo seguro de LocalDateTime → String
             String fechaSalida = viajeActivo.isPresent() && viajeActivo.get().getFechaSalida() != null
-                ? viajeActivo.get().getFechaSalida().format(FORMATO_FECHA)
-                : null;
+                    ? viajeActivo.get().getFechaSalida().format(FORMATO_FECHA)
+                    : null;
 
             String fechaLlegadaEstimada = viajeActivo.isPresent() && viajeActivo.get().getFechaLlegadaEstimada() != null
-                ? viajeActivo.get().getFechaLlegadaEstimada().format(FORMATO_FECHA)
-                : null;
+                    ? viajeActivo.get().getFechaLlegadaEstimada().format(FORMATO_FECHA)
+                    : null;
 
             UnidadPanelDTO dto = new UnidadPanelDTO(
-                u.getIdUnidad(),
-                u.getNumeroEconomico(),
-                u.getTipoUnidad() != null ? u.getTipoUnidad().name() : null,
-                u.getPlacas(),
-                u.getOperadorAsignado(),
-                u.getEstadoSemaforo() != null ? u.getEstadoSemaforo().name() : null,
-                u.getObservacionesSemaforo(),
-                estadoViaje != null ? estadoViaje.name() : null,
-                origen,
-                destino,
-                fechaSalida,
-                fechaLlegadaEstimada
-            );
+                    u.getIdUnidad(),
+                    u.getNumeroEconomico(),
+                    u.getTipoUnidad() != null ? u.getTipoUnidad().name() : null,
+                    u.getMarca(), // 4 ✅ NUEVO
+                    u.getModelo(), // 5 ✅ NUEVO
+                    u.getPlacas(),
+                    u.getOperadorAsignado(),
+                    u.getEstadoSemaforo() != null ? u.getEstadoSemaforo().name() : null,
+                    u.getObservacionesSemaforo(),
+                    estadoViaje != null ? estadoViaje.name() : null,
+                    origen,
+                    destino,
+                    fechaSalida,
+                    fechaLlegadaEstimada);
             panel.add(dto);
         }
         return panel;
@@ -83,7 +83,7 @@ public class UnidadService {
 
     public Unidad obtenerPorId(Integer id) {
         return unidadRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Unidad no encontrada con ID: " + id));
+                .orElseThrow(() -> new RuntimeException("Unidad no encontrada con ID: " + id));
     }
 
     public Unidad guardarUnidad(Unidad unidad) {
@@ -93,6 +93,14 @@ public class UnidadService {
     public void desactivarUnidad(Integer id) {
         Unidad unidad = obtenerPorId(id);
         unidad.setActivo(false);
+        unidadRepository.save(unidad);
+    }
+
+    public Unidad buscarPorId(Integer id) {
+        return unidadRepository.findById(id).orElse(null);
+    }
+
+    public void guardar(Unidad unidad) {
         unidadRepository.save(unidad);
     }
 }
